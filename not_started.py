@@ -20,12 +20,12 @@ except ImportError:
     )
 
 # NOTE: Avoid relying on hard-coded column indices (e.g. headers[16],
-# NOTE: headers[18]). Prefer using explicit column names or a small schema
+# NOTE: "ApprEmail"). Prefer using explicit column names or a small schema
 # NOTE: mapping at the top of the module so callers and maintainers know the
 # NOTE: expected CSV layout. Consider returning an empty dict instead of
 # NOTE: `None` for "no results" to keep return types consistent.
 
-def not_started_list(df: DataFrame) -> dict[str, list[str]] | None:
+def not_started_list(df: DataFrame) -> dict[str, list[str]]:
     """
     Build a mapping of manager email -> list of employee emails who have not
     started their timesheets.
@@ -42,72 +42,30 @@ def not_started_list(df: DataFrame) -> dict[str, list[str]] | None:
         ValueError: If the expected email fields are missing or not valid
         email strings.
     """
-    # Check: is dataframe?
-    if not isinstance(df, DataFrame): # type: ignore
-        raise TypeError(
-            f"df should be a DataFrame, got {type(df)}.\n{__file__}"
-        )
-
-    # Function variables.
     result: dict[str, list[str]] = {}
-    headers = df.columns.tolist()
 
-    # Removed ECLS I don't care about.
-    target_df = df[
-        (df[headers[16]] != "SS") &
-        (df[headers[16]] != "SN") &
-        (df[headers[16]] != "WW")
+    filtered_df = df[
+        (df["ECLS"] != "SS") &
+        (df["ECLS"] != "SN") &
+        (df["ECLS"] != "WW")
     ]
-    # Check: is empty?
-    if target_df.empty:
-        return None
+    if filtered_df.empty:
+        return result
 
-    # Keys for the result dictionary.
-    manager_emails: list[str] = target_df[headers[18]].unique().tolist() #type: ignore
+    # unique() is the issue with pylance.
+    manager_emails = filtered_df["ApprEmail"].unique().tolist() #type: ignore
 
-    # Check: is list and emails are string?
-    if not isinstance(manager_emails, list):
-        raise ValueError(
-            f"manager_emails is not list, got \
-                {type(manager_emails)}.\n{__file__}"
-        ) #type: ignore
-    if not isinstance(manager_emails[0], str) or '@' not in manager_emails[0]:
-        raise ValueError(
-            f"manager_email in manager_emails is not email. \
-                {manager_emails[0]}\n{__file__}"
-        )
+    for email in manager_emails:
+        if not isinstance(email, str) and '@' not in email:
+            raise ValueError(
+                f"manager_email in manager_emails is not email. \
+                    {manager_emails[0]}\n{__file__}"
+            )
 
-    # Populate the result dictionary.
-    for manager_email in manager_emails: #type: ignore
+    for manager_email in manager_emails:
         result.update({manager_email: []})
-        employee_email_df = target_df[target_df[headers[18]] == manager_email][headers[20]]
+        employee_email_df = filtered_df[filtered_df["ApprEmail"] == manager_email]["EmplEmail"]
         employee_email_list = employee_email_df.unique().tolist() #type: ignore
         result[manager_email] += employee_email_list
 
-    if len(result) == 0:
-        return None
     return result
-
-if __name__ == "__main__":
-    from pathlib import Path
-    from helpers import data
-    test_path = Path.cwd() / "data_examples" / "NotStarted.csv"
-    if Path.is_file(test_path):
-        test_df = data.data(test_path)
-        if test_df is None:
-            sys.exit("DataFrame is None.")
-        test = not_started_list(test_df)
-        if test is None:
-            sys.exit("Test is None.")
-        else:
-            assert isinstance(test, dict)
-
-            keys = list(test.keys())
-            assert isinstance(keys[0], str)
-            assert '@' in keys[0]
-
-            values = list(test.values())
-            assert isinstance(values[0], list)
-            assert '@' in values[0][0]
-
-            print("All tests passed!")

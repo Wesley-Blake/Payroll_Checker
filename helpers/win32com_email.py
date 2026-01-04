@@ -80,14 +80,3 @@ They are BCC'd on this email, so there is no action needed on your part.
         mail.Display()
     else:
         mail.Send()
-
-if __name__ == "__main__":
-    email(
-        cc="manager@mail.com",
-        bcc=[
-            "employee1@mail.com",
-            "employee2@mail.com"
-        ],
-        pay_period="BW??",
-        body="Errors",
-    )

@@ -21,10 +21,10 @@ except ImportError:
 # NOTE: the expected column names. Avoid indexing columns by position;
 # NOTE: use column names or a schema translation layer. Also consider
 # NOTE: returning an empty mapping instead of `None` when there are no
-# NOTE: matches, and reduce use of `# type: ignore` by narrowing code paths
+# NOTE: matches, and reduce use of `#type: ignore` by narrowing code paths
 # NOTE: or using pandas typing support.
 
-def over_eight_hours(df: DataFrame, email_df: DataFrame) -> dict[str, list[str]] | None:
+def over_eight_hours(df: DataFrame, email_df: DataFrame) -> dict[str, list[str]]:
     """
     Identify employees who exceeded daily hour thresholds and group them by
     their supervisor's email.
@@ -47,6 +47,7 @@ def over_eight_hours(df: DataFrame, email_df: DataFrame) -> dict[str, list[str]]
         raise TypeError(f"df should be a DataFrame, got {type(email_df)}")
 
     # Get final_df
+    result: dict[str,list[str]] = {}
     WHITE_LIST = [
         "Empl_ID",
         "LastName",
@@ -57,10 +58,10 @@ def over_eight_hours(df: DataFrame, email_df: DataFrame) -> dict[str, list[str]]
         "earning_hours"
     ]
     new_order_df = df[WHITE_LIST]
-    filtered_df = new_order_df.groupby(
+    filtered_df = new_order_df.groupby( #type: ignore
         WHITE_LIST[:-1],
         as_index=False
-    )["earning_hours"].sum() #type: ignore
+    )["earning_hours"].sum() 
     earn_code = filtered_df[WHITE_LIST[3]] == "REG"
     union = (
         (filtered_df[WHITE_LIST[2]] == "UU") &
@@ -79,7 +80,7 @@ def over_eight_hours(df: DataFrame, email_df: DataFrame) -> dict[str, list[str]]
 
     pre_final_df = filtered_df[earn_code & (union | non_union)]
     if pre_final_df.empty:
-        return None
+        return result
 
     # Get dict
     EMAIL_WHITE_LIST = [
@@ -87,46 +88,33 @@ def over_eight_hours(df: DataFrame, email_df: DataFrame) -> dict[str, list[str]]
         "PacificEmail",
         "SupervisorEmail"
     ]
-    result: dict[str,list[str]] = {}
 
     ordered_email_df = email_df[EMAIL_WHITE_LIST].drop_duplicates()
-    final_df = pd.merge(
+    final_df = pd.merge( #type: ignore
         pre_final_df,
         ordered_email_df,
         left_on="Empl_ID",
         right_on="EmplID",
         how="inner"
-    ) # type: ignore
+    ) 
     headers = final_df.columns.tolist()
 
-    manager_emails: list[str] = final_df[headers[-1]].unique().tolist() # type: ignore
+    manager_emails: list[str] = final_df[headers[-1]].unique().tolist() #type: ignore
     if not isinstance(manager_emails,list):
         raise ValueError(
             f"manager_emails is not list, got \
-            {type(manager_emails)}.\n{__file__}"
-        ) # type: ignore
+            {type(manager_emails)}.\n{__file__}" #type: ignore
+        )
     if not isinstance(manager_emails[0],str) or '@' not in manager_emails[0]:
         raise ValueError(
             f"manager_email in manager_emails is not email. \
             {manager_emails[0]}\n{__file__}"
         )
 
-    for manager_email in manager_emails: # type: ignore
+    for manager_email in manager_emails: #type: ignore
         if manager_email not in result:
-            result.update({manager_email: []}) # type: ignore
+            result.update({manager_email: []}) #type: ignore
         employee_email_df = final_df[final_df[headers[-1]] == manager_email][headers[-2]]
-        employee_email_list = employee_email_df.unique().tolist() # type: ignore
+        employee_email_list = employee_email_df.unique().tolist() #type: ignore
         result[manager_email] += employee_email_list
-    if len(result) == 0:
-        return None
-    return result # type: ignore
-
-if __name__ == "__main__":
-    from pathlib import Path
-    from helpers.data import data
-    myData = Path.cwd() / "data_examples" / "hours-breakdown.csv"
-    myEmailData = Path.cwd() / "data_examples" / "emails.csv"
-    data_df = data(myData)
-    email_df = data(myEmailData)
-    for man, email in over_eight_hours(data_df,email_df).items():
-        print(man, email)
+    return result 
