@@ -8,13 +8,8 @@ notification purposes.
 Dependencies:
     - pandas
 """
-
-import sys
-try:
-    from pandas import DataFrame
-    import pandas as pd
-except ImportError:
-    sys.exit(f" Failed to import the packages. {__file__}")
+from pandas import DataFrame
+import pandas as pd
 
 # NOTE: Move per-file column lists (WHITE_LIST, EMAIL_WHITE_LIST) and
 # NOTE: numeric thresholds (7.5, 8) to module-level constants, and document
