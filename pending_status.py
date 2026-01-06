@@ -1,18 +1,28 @@
 import pandas as pd
+from pathlib import Path
+import validators
+from logger_config import setup_logger
 
-def pending(file):
-    df = pd.read_csv(file)
-    result = {}
+def pending(file: Path) -> list[str]:
+    logger = setup_logger(__name__)
+    if file.is_file():
+        df = pd.read_csv(file)
+    else:
+        logger.error("Failed to create DataFrame.")
+        return []
 
-    final_df = df[df["status"] == "pending"]
+    final_df = df[df["ts_Status"] == "Pending"]
 
     if final_df.empty:
+        logger.info("No employees in pending.")
         return result
 
-    manager_emails = final_df[final_df["manager_email"]].unique().tolist()
+    manager_emails = final_df["ApprEmail"].unique().tolist()
 
-    for manger_email in manager_emails:
-        result.update({manger_email: []})
-        result[manger_email] += final_df[final_df["manager_email"]].unique().tolist()
-    
-    return result
+    for email in manager_emails:
+        if not validators.email(email):
+            logger.debug("Manager emails not emails.")
+            return []
+
+    logger.info("Finished Successfully.")
+    return manager_emails

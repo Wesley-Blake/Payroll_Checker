@@ -1,77 +1,49 @@
-"""
-main.py
-
-A small entrypoint used for manual testing of the Payroll Checker utilities
-while a CLI or TUI is being developed.
-
-This script demonstrates discovery of recent report files and invoking the
-helper modules to build and send notifications.
-
-Dependencies:
-    - pandas
-    - helpers (local package)
-"""
+import argparse
 import os
-import sys
 from pathlib import Path
+from not_started import not_started_list
+from pending_status import pending
+from over_eight_hours import over_eight_hours
+from win32com_email import email
 
-# My stuff to add
-try:
-    from helpers import data, pay_period_detector, win32com_email
-    import not_started
-    import over_eight_hours
-except ImportError:
-    sys.exit("Failed to import helper funcitons.")
 
-# NOTE: This script uses interactive input and ad-hoc file discovery in
-# NOTE: the user's Downloads folder. Consider adding an `argparse`-based
-# NOTE: CLI for reproducibility and testability, and avoid calling
-# NOTE: `sys.exit()` from imported helpers — let the application entry
-# NOTE: point handle process termination.
+def main():
+    DOWNLOADS = Path.home() / "Downloads"
+
+    NOT_STARTED = ""
+    PENDING = ""
+    OVERTIME = ""
+    EMAIL = ""
+    PAY_PERIOD = input("Enter pay period: ")
+    for file in os.scandir(DOWNLOADS):
+        if "not_yet_started_WTE" in file.name and file.name > NOT_STARTED:
+            NOT_STARTED = file.name
+        if "Time_Sheet_Status" in file.name and file.name > PENDING:
+            PENDING = file.name
+        if "ts_break_down" in file.name and file.name > OVERTIME:
+            OVERTIME = file.name
+        if "Active" in file.name and file.name > EMAIL:
+            EMAIL = file.name
+    path_not_started =  DOWNLOADS / NOT_STARTED
+    path_pending = DOWNLOADS / PENDING
+    path_overtime = DOWNLOADS / OVERTIME
+    path_email = DOWNLOADS / EMAIL
+
+    result_not_started = not_started_list(path_not_started)
+    if len(result_not_started) > 0:
+        for manager, employee in result_not_started.items():
+            email(manager,employee,PAY_PERIOD,"Timesheet Not Started.")
+
+    result_pending = pending(path_pending)
+    if len(result_pending) > 0:
+        for manager in result_pending:
+            email(manager,[],PAY_PERIOD,"Timesheets pending your approval!")
+
+    result_overtime = over_eight_hours(path_overtime, path_email)
+    if len(result_overtime) > 0:
+        for manager, employee in result_overtime.items():
+            email(manager,employee,PAY_PERIOD,"Overtime Not Allocated.")
+
 
 if __name__ == "__main__":
-    # Initial paths
-    DOWNLOADS = Path.home() / "Downloads"
-    # NOTE: this sucks, change it.
-    try:
-        y,m,d, *_ = [int(x) for x in input("First Check Date YYYY MM DD: ").split()]
-        PAY_PERIOD = pay_period_detector.pay_period_detector(y,m,d)
-    except Exception as e:
-        sys.exit(f"Date Failure. {e}")
-
-    # Not Started Emails
-    not_started_csv_list = [csv for csv in os.scandir(DOWNLOADS) if csv.name.find("started_WTE_Timesheets") >= 0]
-    if len(not_started_csv_list) > 0:
-        not_started_csv = max(not_started_csv_list)
-        not_started_df = data.data(DOWNLOADS / not_started_csv)
-        emails_dict = not_started.not_started_list(not_started_df)
-        if emails_dict is not None:
-            for manager, employee in emails_dict.items():
-                win32com_email.email(
-                    cc=manager,
-                    bcc=employee,
-                    pay_period=PAY_PERIOD,
-                    body="Timesheet not started."
-                )
-    else:
-        print("Couldn't find Not Started Report.")
-
-    # REG over 8 or 7.5 for union
-    overtime_csv_list = [csv for csv in os.scandir(DOWNLOADS) if csv.name.startswith("ts_break_down")]
-    email_csv_list = [csv for csv in os.scandir(DOWNLOADS) if csv.name.startswith("Active")]
-    if len(overtime_csv_list) > 0 and len(email_csv_list) > 0:
-        overtime_csv = max(overtime_csv_list)
-        overtime_df = data.data(DOWNLOADS / overtime_csv)
-        email_csv = max(email_csv_list)
-        email_df = data.data(DOWNLOADS / email_csv)
-        if overtime_df is not None:
-            emails_dict = over_eight_hours.over_eight_hours(overtime_df, email_df)
-            for manager, employee in emails_dict.items():
-                win32com_email.email(
-                    cc=manager,
-                    bcc=employee,
-                    pay_period=PAY_PERIOD,
-                    body="Overtime not allocated."
-                )
-    else:
-        print("Couldn't find Overtime and/or Active Employee Report.")
+    main()
