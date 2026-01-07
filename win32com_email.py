@@ -20,5 +20,5 @@ Error: {body}
 If you are receiving this email, it means that {len(bcc)} of your employees have some issue related to their timesheet: {pay_period}.
 They are BCC'd on this email, so there is no action needed on your part.
 """
-    #mail.Send()
-    mail.Display()
+    mail.Send()
+    #mail.Display()
