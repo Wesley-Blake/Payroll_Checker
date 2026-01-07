@@ -36,8 +36,7 @@ def main():
 
     result_pending = pending(path_pending)
     if len(result_pending) > 0:
-        for manager in result_pending:
-            email(manager,[],PAY_PERIOD,"Timesheets pending your approval!")
+        email("",result_pending,PAY_PERIOD,"Timesheets pending your approval!")
 
     result_overtime = over_eight_hours(path_overtime, path_email)
     if len(result_overtime) > 0:
