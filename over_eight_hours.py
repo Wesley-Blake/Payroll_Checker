@@ -5,7 +5,7 @@ from logger_config import setup_logger
 
 
 def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]:
-    logger = setup_logger(__name__)
+    logger = setup_logger("PayRollChecker.log")
 
     if file_hours.is_file() and file_email.is_file():
         df = pd.read_csv(file_hours)
@@ -13,7 +13,6 @@ def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]
         logger.error("Failed to create DataFrame.")
         return {}
 
-    result: dict[str,list[str]] = {}
     WHITE_LIST = [
         "Empl_ID",
         "LastName",
@@ -65,6 +64,7 @@ def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]
     )
     headers = merged_df.columns
 
+    result: dict[str,list[str]] = {}
     manager_emails: list[str] = merged_df[headers[-1]].unique().tolist()
     for manager_email in manager_emails:
         result.update({manager_email: []})

@@ -4,7 +4,7 @@ import validators
 from logger_config import setup_logger
 
 def pending(file: Path) -> list[str]:
-    logger = setup_logger(__name__)
+    logger = setup_logger("PayRollChecker.log")
     if file.is_file():
         df = pd.read_csv(file)
     else:
@@ -15,7 +15,7 @@ def pending(file: Path) -> list[str]:
 
     if final_df.empty:
         logger.info("No employees in pending.")
-        return result
+        return []
 
     manager_emails = final_df["ApprEmail"].unique().tolist()
 

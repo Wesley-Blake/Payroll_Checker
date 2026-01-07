@@ -5,7 +5,7 @@ import validators
 from logger_config import setup_logger
 
 def not_started_list(file: Path) -> dict[str, list[str]]:
-    logger = setup_logger(__name__)
+    logger = setup_logger("PayRollChecker.log")
 
     result = {}
     if isinstance(file, Path) and file.is_file():
