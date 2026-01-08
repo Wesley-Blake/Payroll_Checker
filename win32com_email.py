@@ -16,16 +16,7 @@ def email(cc: str, bcc: list[str], pay_period: str, body: str, test: bool = Fals
         attachment = Path(file.readline().strip())
     if attachment.is_file():
         mail.Attachments.Add(str(attachment))
-    mail.Body = \
-f"""\
-Hi,
-
-Employee Error: {body}
-
-For Manager:
-If you are receiving this email, it means that {len(bcc)} of your employees have some issue related to their timesheet: {pay_period}.
-They are BCC'd on this email, so there is no action needed on your part.
-"""
+    mail.Body = body
     if test:
         mail.Display()
     else:
