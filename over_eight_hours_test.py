@@ -10,7 +10,6 @@ def main():
     emails = emails / "data_examples" / "emails.csv"
 
     test = over_eight_hours(hours, emails)
-    print(f"{test=}")
 
 if __name__ == "__main__":
     main()

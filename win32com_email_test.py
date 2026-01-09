@@ -5,6 +5,6 @@ with open("secret.txt", "r") as file:
         if '@' in i:
             cc = i
         else:
-            cc = "Fuck"
+            cc = ""
 
 email(cc,[],2,"testing",True)
