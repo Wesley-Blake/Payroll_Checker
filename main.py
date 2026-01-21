@@ -1,14 +1,14 @@
-import argparse
 import os
 from pathlib import Path
-from not_started import not_started_list
-from over_eight_hours import over_eight_hours
-from overlapping_hours import overlapping_hours
-from pending_status import pending
-from win32com_email import email
+from helpers.not_started import not_started_list
+from helpers.over_eight_hours import over_eight_hours
+from helpers.overlapping_hours import overlapping_hours
+from helpers.pending_status import pending
+from helpers.win32com_email import email
 
 
 def main(test: bool = False):
+    os.chdir(Path.cwd() / 'Payroll-Checker')
     DOWNLOADS = Path.home() / "Downloads"
 
     PAY_PERIOD = input("Enter pay period: ")

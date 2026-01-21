@@ -2,9 +2,9 @@ from pathlib import Path
 import logging
 import pandas as pd
 import validators
-from logger_config import setup_logger
+from helpers.logger_config import setup_logger
 
-def overlapping_hours(file: Path) -> dict[str,list[str]]:
+def not_started_list(file: Path) -> dict[str, list[str]]:
     logger = setup_logger("PayRollChecker.log")
 
     result = {}
@@ -15,23 +15,19 @@ def overlapping_hours(file: Path) -> dict[str,list[str]]:
         return {}
 
     final_df = df[
-        (df["earn_code"] == "OT") |
-        (df["earn_code"] == "OT2") |
-        (df["earn_code"] == "VAC") |
-        (df["earn_code"] == "SICK") |
-        (df["earn_code"] == "MD") |
-        (df["earn_code"] == "PER")
+        (df["job_ecls"] != "SS") &
+        (df["job_ecls"] != "SN") &
+        (df["job_ecls"] != "WW")
     ]
-
     if final_df.empty:
-        logger.info("No overlapping hours.")
+        logger.info("All employees started.")
         return {}
 
-    manager_emails = final_df["Appr_Email"].unique().tolist()
+    manager_emails = final_df["ApprEmail"].unique().tolist()
 
     for manager_email in manager_emails:
         result.update({manager_email: []})
-        employee_email_df = final_df[final_df["Appr_Email"] == manager_email]["Empl_Email"]
+        employee_email_df = final_df[final_df["ApprEmail"] == manager_email]["EmplEmail"]
         employee_email_list = employee_email_df.unique().tolist()
         result[manager_email] += employee_email_list
 
