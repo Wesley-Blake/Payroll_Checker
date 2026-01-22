@@ -12,6 +12,7 @@ def main(test: bool = False):
     if working_dir.is_dir():
         os.chdir(working_dir)
     else:
+        print(working_dir)
         raise ValueError
     DOWNLOADS = Path.home() / "Downloads"
 
