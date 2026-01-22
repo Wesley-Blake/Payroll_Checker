@@ -5,42 +5,39 @@ import validators
 from helpers.logger_config import setup_logger
 
 def overlapping_hours(file: Path) -> dict[str,list[str]]:
-    logger = setup_logger("PayRollChecker.log")
+    logger = setup_logger('PayRollChecker.log')
 
     result = {}
     if isinstance(file, Path) and file.is_file():
         df = pd.read_csv(file)
     else:
-        logger.error("Failed to create DataFream.")
+        logger.error('Failed to create DataFream.')
         return {}
 
-    final_df = df[
-        (df["earn_code"] == "REG") |
-        (df["earn_code"] == "SHF") |
-        (df["earn_code"] == "HOL") |
-        (df["earn_code"] == "HLW") |
-    ]
+    white_list = ['REG', 'SHF', 'HOL', 'HLW']
+
+    final_df = df[df['earn_code'].isin(white_list)]
 
     if final_df.empty:
-        logger.info("No overlapping hours.")
+        logger.info('No overlapping hours.')
         return {}
 
-    manager_emails = final_df["Appr_Email"].unique().tolist()
+    manager_emails = final_df['Appr_Email'].unique().tolist()
 
     for manager_email in manager_emails:
         result.update({manager_email: []})
-        employee_email_df = final_df[final_df["Appr_Email"] == manager_email]["Empl_Email"]
+        employee_email_df = final_df[final_df['Appr_Email'] == manager_email]['Empl_Email']
         employee_email_list = employee_email_df.unique().tolist()
         result[manager_email] += employee_email_list
 
     for manager, employee in result.items():
         if not validators.email(manager):
-            logger.error("Manager email isn't email.")
+            logger.error('Manager email isn't email.')
             return {}
         for email in employee:
             if not validators.email(email):
-                logger.error("Employee email isn't email.")
+                logger.error('Employee email isn't email.')
                 return {}
 
-    logger.info("Finished successfully.")
+    logger.info('Finished successfully.')
     return result
