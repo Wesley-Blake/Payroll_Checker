@@ -15,12 +15,10 @@ def overlapping_hours(file: Path) -> dict[str,list[str]]:
         return {}
 
     final_df = df[
-        (df["earn_code"] == "OT") |
-        (df["earn_code"] == "OT2") |
-        (df["earn_code"] == "VAC") |
-        (df["earn_code"] == "SICK") |
-        (df["earn_code"] == "MD") |
-        (df["earn_code"] == "PER")
+        (df["earn_code"] == "REG") |
+        (df["earn_code"] == "SHF") |
+        (df["earn_code"] == "HOL") |
+        (df["earn_code"] == "HLW") |
     ]
 
     if final_df.empty:
