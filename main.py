@@ -8,7 +8,11 @@ from helpers.win32com_email import email
 
 
 def main(test: bool = False):
-    os.chdir(Path.cwd() / 'Payroll-Checker')
+    working_dir = Path.cwd() / 'Payroll-Checker'
+    if working_dir.is_dir():
+        os.chdir(working_dir)
+    else:
+        raise ValueError
     DOWNLOADS = Path.home() / "Downloads"
 
     PAY_PERIOD = input("Enter pay period: ")
@@ -17,30 +21,22 @@ def main(test: bool = False):
     EMAIL = ""
     OVERLAPPING = ""
     PENDING = ""
-    if not test:
-        for file in os.scandir(DOWNLOADS):
-            if "not_yet_started_WTE" in file.name and file.name > NOT_STARTED:
-                NOT_STARTED = file.name
-            elif "ts_break_down" in file.name and file.name > OVERTIME:
-                OVERTIME = file.name
-            elif "Active" in file.name and file.name > EMAIL:
-                EMAIL = file.name
-            elif "Overlapping_Hours" in file.name and file.name > OVERLAPPING:
-                OVERLAPPING = file.name
-            elif "Time_Sheet_Status" in file.name and file.name > PENDING:
-                PENDING = file.name
-        path_not_started =  DOWNLOADS / NOT_STARTED
-        path_overtime = DOWNLOADS / OVERTIME
-        path_email = DOWNLOADS / EMAIL
-        path_overlapping = DOWNLOADS / OVERLAPPING
-        path_pending = DOWNLOADS / PENDING
-    else:
-        DOCUMENTS = Path.home() / "Documents\\.mycode\\Payroll-Checker\\data_examples"
-        path_not_started =  DOCUMENTS  / "NotStarted.csv"
-        path_overtime = DOCUMENTS / "hours-breakdown.csv"
-        path_email = DOCUMENTS / "emails.csv"
-        path_overlapping = DOCUMENTS / "overlapping_hours.csv"
-        path_pending = DOCUMENTS / "comments-status.csv"
+    for file in os.scandir(DOWNLOADS):
+        if "not_yet_started_WTE" in file.name and file.name > NOT_STARTED:
+            NOT_STARTED = file.name
+        elif "ts_break_down" in file.name and file.name > OVERTIME:
+            OVERTIME = file.name
+        elif "Active" in file.name and file.name > EMAIL:
+            EMAIL = file.name
+        elif "Overlapping_Hours" in file.name and file.name > OVERLAPPING:
+            OVERLAPPING = file.name
+        elif "Time_Sheet_Status" in file.name and file.name > PENDING:
+            PENDING = file.name
+    path_not_started =  DOWNLOADS / NOT_STARTED
+    path_overtime = DOWNLOADS / OVERTIME
+    path_email = DOWNLOADS / EMAIL
+    path_overlapping = DOWNLOADS / OVERLAPPING
+    path_pending = DOWNLOADS / PENDING
 
     # Not Started Check
     result_not_started = not_started_list(path_not_started)
@@ -59,7 +55,6 @@ For Manager:
 If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
 They are BCC'd on this email, so there is no action needed on your part.
 """,
-test
             )
 
     # Overtime Check
@@ -80,7 +75,6 @@ For Manager:
 If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
 They are BCC'd on this email, so there is no action needed on your part.
 """,
-test
             )
 
     # Overlapping Check
@@ -101,7 +95,6 @@ For Manager:
 If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
 They are BCC'd on this email, so there is no action needed on your part.
 """,
-test
             )
 
     # Pending Check
@@ -117,7 +110,6 @@ Hi,
 For Manager:
 You have employees in a pending status. Please approve them!
 """,
-test
         )
 
 

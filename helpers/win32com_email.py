@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import win32com.client as win32
 
-def email(cc: str, bcc: list[str], pay_period: str, body: str, test: bool = False) -> None:
+def email(cc: str, bcc: list[str], pay_period: str, body: str) -> None:
     try:
         outlook = win32.Dispatch('outlook.application')
     except Exception as e:
@@ -18,7 +18,5 @@ def email(cc: str, bcc: list[str], pay_period: str, body: str, test: bool = Fals
     if attachment.is_file():
         mail.Attachments.Add(str(attachment))
     mail.Body = body
-    if test:
-        mail.Display()
-    else:
-        mail.Send()
+    #mail.Display()
+    mail.Send()
