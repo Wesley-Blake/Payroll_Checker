@@ -2,7 +2,7 @@ from pathlib import Path
 import logging
 import pandas as pd
 import validators
-from helpers.logger_config import setup_logger
+from logger_config import setup_logger
 
 def overlapping_hours(file: Path) -> dict[str,list[str]]:
     logger = setup_logger('PayRollChecker.log')
@@ -16,7 +16,7 @@ def overlapping_hours(file: Path) -> dict[str,list[str]]:
 
     white_list = ['REG', 'SHF', 'HOL', 'HLW']
 
-    final_df = df[df['earn_code'].isin(white_list)]
+    final_df = df[~df['earn_code'].isin(white_list)]
 
     if final_df.empty:
         logger.info('No overlapping hours.')
@@ -41,3 +41,7 @@ def overlapping_hours(file: Path) -> dict[str,list[str]]:
 
     logger.info('Finished successfully.')
     return result
+
+if __name__ == '__main__':
+    path = Path("C:\\Users\\wblake1\\Downloads\\Empls_with_Overlapping_Hours Report_20260123_093502.csv")
+    print(overlapping_hours(path))

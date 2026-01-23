@@ -2,7 +2,7 @@ from pathlib import Path
 import logging
 import pandas as pd
 import validators
-from helpers.logger_config import setup_logger
+from logger_config import setup_logger
 
 def not_started_list(file: Path) -> dict[str, list[str]]:
     logger = setup_logger("PayRollChecker.log")
