@@ -32,11 +32,11 @@ def overlapping_hours(file: Path) -> dict[str,list[str]]:
 
     for manager, employee in result.items():
         if not validators.email(manager):
-            logger.error('Manager email isn't email.')
+            logger.error("Manager email isn't email.")
             return {}
         for email in employee:
             if not validators.email(email):
-                logger.error('Employee email isn't email.')
+                logger.error("Employee email isn't email.")
                 return {}
 
     logger.info('Finished successfully.')
