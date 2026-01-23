@@ -6,17 +6,25 @@ from helpers.overlapping_hours import overlapping_hours
 from helpers.pending_status import pending
 from helpers.win32com_email import email
 
+def loading_bar(length, index=1):
+    BAR_LENGTH = 30
+    while index <= length:
+        block = int(BAR_LENGTH * index / length)
+        bar = '=' * block + '-' * (BAR_LENGTH - block)
+        yield f'\r|{bar}| {index} / {length} emails sent.'
+        index += 1
 
-def main(test: bool = False):
-    working_dir = Path.cwd() / 'Payroll-Checker'
-    if working_dir.is_dir():
-        os.chdir(working_dir)
+def main():
+    WORKING_DIR = Path.cwd() / 'Payroll-Checker'
+    if WORKING_DIR.is_dir():
+        os.chdir(WORKING_DIR)
     else:
-        print(working_dir)
+        print(WORKING_DIR)
         raise ValueError
     DOWNLOADS = Path.home() / "Downloads"
 
     PAY_PERIOD = input("Enter pay period: ")
+    print("Starting file search:")
     NOT_STARTED = ""
     OVERTIME = ""
     EMAIL = ""
@@ -38,81 +46,99 @@ def main(test: bool = False):
     path_email = DOWNLOADS / EMAIL
     path_overlapping = DOWNLOADS / OVERLAPPING
     path_pending = DOWNLOADS / PENDING
+    print("File search compelted!")
+
 
     # Not Started Check
     result_not_started = not_started_list(path_not_started)
-    if len(result_not_started) > 0:
+    length = len(result_not_started)
+    if length > 0:
+        my_bar = loading_bar(length)
+        print("Not Started Emails:")
         for manager, employee in result_not_started.items():
+            print(next(my_bar),end='',flush=True)
             email(
                 manager,
                 employee,
                 PAY_PERIOD,
-f"""\
-Hi,
+                f"""\
+                Hi,
 
-Employee Action: Timesheet Not Started!
+                Employee Action: Timesheet Not Started!
 
-For Manager:
-If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
-They are BCC'd on this email, so there is no action needed on your part.
-""",
+                For Manager:
+                If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
+                They are BCC'd on this email, so there is no action needed on your part.
+                """,
             )
 
     # Overtime Check
     result_overtime = over_eight_hours(path_overtime, path_email)
-    if len(result_overtime) > 0:
+    length = len(result_overtime)
+    if  length > 0:
+        my_bar = loading_bar(length)
+        print("\nOveritme Emails: ")
         for manager, employee in result_overtime.items():
+            print(next(my_bar),end='',flush=True)
             email(
                 manager,
                 employee,
                 PAY_PERIOD,
-f"""\
-Hi,
+                f"""\
+                Hi,
 
-Employee Action: Overtime Not Allocated!
-You have time that is greater than 8 (7.5 union) REG hours in a day.
+                Employee Action: Overtime Not Allocated!
+                You have time that is greater than 8 (7.5 union) REG hours in a day.
 
-For Manager:
-If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
-They are BCC'd on this email, so there is no action needed on your part.
-""",
+                For Manager:
+                If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
+                They are BCC'd on this email, so there is no action needed on your part.
+                """,
             )
 
     # Overlapping Check
     result_overlapping = overlapping_hours(path_overlapping)
-    if len(result_overlapping) > 0:
+    length = len(result_overlapping)
+    if  length > 0:
+        my_bar = loading_bar(length)
+        print("\nOverlapping Hours Emails:")
         for manager, employee in result_overlapping.items():
+            print(next(my_bar),end='',flush=True)
             email(
                 manager,
                 employee,
                 PAY_PERIOD,
-f"""\
-Hi,
+                f"""\
+                Hi,
 
-Employee Action: Overlapping Hours!
-You have hours somewhere that are overlapping!
+                Employee Action: Overlapping Hours!
+                You have hours somewhere that are overlapping!
 
-For Manager:
-If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
-They are BCC'd on this email, so there is no action needed on your part.
-""",
+                For Manager:
+                If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
+                They are BCC'd on this email, so there is no action needed on your part.
+                """,
             )
 
     # Pending Check
     result_pending = pending(path_pending)
     if len(result_pending) > 0:
+        print("\nPending Email: ")
+        my_bar = loading_bar(1)
+        print(next(my_bar),end='',flush=True)
         email(
             "",
             result_pending,
             PAY_PERIOD,
-f"""\
-Hi,
+            f"""\
+            Hi,
 
-For Manager:
-You have employees in a pending status. Please approve them!
-""",
+            For Manager:
+            You have employees in a pending status. Please approve them!
+            """,
         )
 
 
 if __name__ == "__main__":
     main()
+    print("\nI'm done!")
