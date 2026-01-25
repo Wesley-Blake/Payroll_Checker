@@ -6,12 +6,12 @@ from helpers.overlapping_hours import overlapping_hours
 from helpers.pending_status import pending
 from helpers.win32com_email import email
 
-def loading_bar(length, index=1):
+def loading_bar(length, index=1, pre_fix = ''):
     BAR_LENGTH = 30
     while index <= length:
         block = int(BAR_LENGTH * index / length)
         bar = '=' * block + '-' * (BAR_LENGTH - block)
-        yield f'\r|{bar}| {index} / {length} emails sent.'
+        yield f'\r{pre_fix:3} |{bar}| {index} / {length} emails sent.'
         index += 1
 
 def main():
@@ -50,13 +50,13 @@ def main():
 
 
     # Not Started Check
+    print()
     result_not_started = not_started_list(path_not_started)
     length = len(result_not_started)
     if length > 0:
-        my_bar = loading_bar(length)
-        print("Not Started Emails:")
+        my_bar = loading_bar(length, pre_fix="Not Started Emails:")
         for manager, employee in result_not_started.items():
-            print(next(my_bar),end='',flush=True)
+            print(next(my_bar), end='', flush=True)
             email(
                 manager,
                 employee,
@@ -69,17 +69,17 @@ def main():
                 For Manager:
                 If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
                 They are BCC'd on this email, so there is no action needed on your part.
-                """,
+                """
             )
 
     # Overtime Check
+    print()
     result_overtime = over_eight_hours(path_overtime, path_email)
     length = len(result_overtime)
     if  length > 0:
-        my_bar = loading_bar(length)
-        print("\nOveritme Emails: ")
+        my_bar = loading_bar(length, pre_fix="Overitme Emails: ")
         for manager, employee in result_overtime.items():
-            print(next(my_bar),end='',flush=True)
+            print(next(my_bar), end='', flush=True)
             email(
                 manager,
                 employee,
@@ -93,17 +93,17 @@ def main():
                 For Manager:
                 If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
                 They are BCC'd on this email, so there is no action needed on your part.
-                """,
+                """
             )
 
     # Overlapping Check
+    print()
     result_overlapping = overlapping_hours(path_overlapping)
     length = len(result_overlapping)
     if  length > 0:
-        my_bar = loading_bar(length)
-        print("\nOverlapping Hours Emails:")
+        my_bar = loading_bar(length, pre_fix="Overlapping Hours Emails:")
         for manager, employee in result_overlapping.items():
-            print(next(my_bar),end='',flush=True)
+            print(next(my_bar), end='', flush=True)
             email(
                 manager,
                 employee,
@@ -117,15 +117,15 @@ def main():
                 For Manager:
                 If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
                 They are BCC'd on this email, so there is no action needed on your part.
-                """,
+                """
             )
 
     # Pending Check
+    print()
     result_pending = pending(path_pending)
     if len(result_pending) > 0:
-        print("\nPending Email: ")
-        my_bar = loading_bar(1)
-        print(next(my_bar),end='',flush=True)
+        my_bar = loading_bar(1, pre_fix="Pending Email:")
+        print(next(my_bar), end='', flush=True)
         email(
             "",
             result_pending,
@@ -135,10 +135,11 @@ def main():
 
             For Manager:
             You have employees in a pending status. Please approve them!
-            """,
+            """
         )
 
 
 if __name__ == "__main__":
     main()
-    print("\nI'm done!")
+    print()
+    print("I'm done!")
