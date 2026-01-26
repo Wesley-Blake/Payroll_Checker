@@ -8,10 +8,11 @@ from helpers.win32com_email import email
 
 def loading_bar(length, index=1, pre_fix = ''):
     BAR_LENGTH = 30
+    if len(pre_fix) > 0: print(pre_fix)
     while index <= length:
         block = int(BAR_LENGTH * index / length)
         bar = '=' * block + '-' * (BAR_LENGTH - block)
-        yield f'\r{pre_fix:3} |{bar}| {index} / {length} emails sent.'
+        yield f'\r|{bar}| {index} / {length} emails sent.'
         index += 1
 
 def main():
