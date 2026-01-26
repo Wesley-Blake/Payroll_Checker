@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 import validators
-from logger_config import setup_logger
+from helpers.logger_config import setup_logger
 
 def pending(file: Path) -> list[str]:
     logger = setup_logger("PayRollChecker.log")

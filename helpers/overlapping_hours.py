@@ -2,7 +2,7 @@ from pathlib import Path
 import logging
 import pandas as pd
 import validators
-from logger_config import setup_logger
+from helpers.logger_config import setup_logger
 
 def overlapping_hours(file: Path) -> dict[str,list[str]]:
     logger = setup_logger('PayRollChecker.log')
