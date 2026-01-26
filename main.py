@@ -8,6 +8,7 @@ from helpers.win32com_email import email
 
 def loading_bar(length, index=1, pre_fix = ''):
     BAR_LENGTH = 30
+    print()
     if len(pre_fix) > 0: print(pre_fix)
     while index <= length:
         block = int(BAR_LENGTH * index / length)
@@ -51,7 +52,6 @@ def main():
 
 
     # Not Started Check
-    print()
     result_not_started = not_started_list(path_not_started)
     length = len(result_not_started)
     if length > 0:
@@ -74,7 +74,6 @@ def main():
             )
 
     # Overtime Check
-    print()
     result_overtime = over_eight_hours(path_overtime, path_email)
     length = len(result_overtime)
     if  length > 0:
@@ -98,7 +97,6 @@ def main():
             )
 
     # Overlapping Check
-    print()
     result_overlapping = overlapping_hours(path_overlapping)
     length = len(result_overlapping)
     if  length > 0:
@@ -122,7 +120,6 @@ def main():
             )
 
     # Pending Check
-    print()
     result_pending = pending(path_pending)
     if len(result_pending) > 0:
         my_bar = loading_bar(1, pre_fix="Pending Email:")
