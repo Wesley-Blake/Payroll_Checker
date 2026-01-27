@@ -9,8 +9,9 @@ class TestOverlappingHours:
         assert result == {}
 
     def test_overlapping_hours_returns_dict(self):
-        result = overlapping_hours(Path("data_examples/overlapping_hours.csv"))
+        result = overlapping_hours(Path("tests\\data_examples\\overlapping_hours.csv"))
         assert isinstance(result, dict)
+        assert result == {'manager1@mail.com': ['1@mail.com'], 'manager2@mail.com': ['2@mail.com']}
 
     def test_overlapping_hours_with_string_path(self):
         result = overlapping_hours("")

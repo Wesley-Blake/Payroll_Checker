@@ -1,8 +1,7 @@
 import pandas as pd
 from pathlib import Path
 import validators
-#from helpers.logger_config import setup_logger
-from logger_config import setup_logger
+from helpers.logger_config import setup_logger
 
 
 def over_twleve_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]:
