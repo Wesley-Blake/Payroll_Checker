@@ -8,6 +8,9 @@ from logger_config import setup_logger
 def over_twleve_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]:
     logger = setup_logger("PayRollChecker.log")
 
+    if not isinstance(file_hours, Path) or not isinstance(file_email, Path):
+        logger.error("Invalid file path(s) provided.")
+        return {}
     if file_hours.is_file() and file_email.is_file():
         df = pd.read_csv(file_hours)
     else:
@@ -76,9 +79,3 @@ def over_twleve_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]
                     return {}
     logger.info("Finished Successfully.")
     return result
-
-
-if __name__ == '__main__':
-    path = Path('C:\\Users\\wblake1\\Documents\\.mycode\\Payroll-Checker\\data_examples\\hours-breakdown.csv')
-    email_path = Path('C:\\Users\\wblake1\\Documents\\.mycode\\Payroll-Checker\\data_examples\\emails.csv')
-    print(over_twleve_hours(path,email_path))

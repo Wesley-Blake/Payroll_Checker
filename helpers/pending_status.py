@@ -5,6 +5,9 @@ from helpers.logger_config import setup_logger
 
 def pending(file: Path) -> list[str]:
     logger = setup_logger("PayRollChecker.log")
+    if not isinstance(file, Path):
+        logger.error("Failed to create DataFrame.")
+        return []
     if file.is_file():
         df = pd.read_csv(file)
     else:
