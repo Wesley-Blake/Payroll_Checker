@@ -14,7 +14,7 @@ class TestPendingStatus:
 
     def test_pending_returns_list(self):
         """Test that valid file returns a list"""
-        result = pending(Path("tests\\data_examples\\comments-status.csv"))
+        result = pending(Path("Payroll-Checker\\tests\\data_examples\\comments-status.csv"))
         assert isinstance(result, list)
 
     def test_pending_with_string_path(self):
@@ -35,36 +35,36 @@ class TestPendingStatus:
     # Return value structure tests
     def test_pending_returns_list_of_strings(self):
         """Test that result contains only strings"""
-        result = pending(Path("tests\\data_examples\\comments-status.csv"))
+        result = pending(Path("Payroll-Checker\\tests\\data_examples\\comments-status.csv"))
         if result:
             for email in result:
                 assert isinstance(email, str)
 
     def test_pending_returns_unique_emails(self):
         """Test that returned emails are unique"""
-        result = pending(Path("tests\\data_examples\\comments-status.csv"))
+        result = pending(Path("Payroll-Checker\\tests\\data_examples\\comments-status.csv"))
         assert len(result) == len(set(result)), "Duplicate emails found in result"
 
     def test_pending_returns_valid_emails(self):
         """Test that all returned values are valid email addresses"""
-        result = pending(Path("tests\\data_examples\\comments-status.csv"))
+        result = pending(Path("Payroll-Checker\\tests\\data_examples\\comments-status.csv"))
         for email in result:
             assert "@" in email, f"Invalid email format: {email}"
 
     # Filter tests
     def test_pending_filters_inprogress_status(self):
         """Test that employees with Inprogress status are filtered out"""
-        result = pending(Path("tests\\data_examples\\comments-status.csv"))
+        result = pending(Path("Payroll-Checker\\tests\\data_examples\\comments-status.csv"))
         assert isinstance(result, list)
 
     def test_pending_filters_approved_status(self):
         """Test that employees with Approved status are filtered out"""
-        result = pending(Path("tests\\data_examples\\comments-status.csv"))
+        result = pending(Path("Payroll-Checker\\tests\\data_examples\\comments-status.csv"))
         assert isinstance(result, list)
 
     def test_pending_includes_only_pending_status(self):
         """Test that only Pending status employees are included"""
-        result = pending(Path("tests\\data_examples\\comments-status.csv"))
+        result = pending(Path("Payroll-Checker\\tests\\data_examples\\comments-status.csv"))
         # From the data: manager1 has 2 pending, manager2 has 2 pending
         assert "manager1@mail.com" in result
         assert "manager2@mail.com" in result

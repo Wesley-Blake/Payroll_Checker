@@ -15,7 +15,7 @@ class TestNotStarted:
 
     def test_not_started_list_returns_dict(self):
         """Test that valid file returns a dict"""
-        result = not_started_list(Path("tests\\data_examples\\NotStarted.csv"))
+        result = not_started_list(Path("Payroll-Checker\\tests\\data_examples\\NotStarted.csv"))
         assert isinstance(result, dict)
 
     def test_not_started_list_with_string_path(self):

@@ -10,14 +10,14 @@ class TestOverEightHours:
 
     def test_over_eight_hours_returns_dict(self):
         result = over_eight_hours(
-            Path("tests\\data_examples\\hours-breakdown.csv"),
-            Path("tests\\data_examples\\emails.csv")
+            Path("Payroll-Checker\\tests\\data_examples\\hours-breakdown.csv"),
+            Path("Payroll-Checker\\tests\\data_examples\\emails.csv")
         )
         assert isinstance(result, dict)
 
     def test_over_eight_hours_with_missing_file(self):
         result = over_eight_hours(
-            Path("tests\\data_examples\\hours-breakdown.csv"),
+            Path("Payroll-Checker\\tests\\data_examples\\hours-breakdown.csv"),
             Path("nonexistent.csv")
         )
         assert result == {}
