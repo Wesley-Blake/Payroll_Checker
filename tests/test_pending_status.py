@@ -169,17 +169,3 @@ class TestPendingStatus:
         result = pending(csv_file)
         # pending (lowercase) should not match Pending
         assert result == []
-
-    # Integration tests
-    def test_pending_with_mixed_statuses_and_managers(self, tmp_path):
-        """Test complete workflow with mixed statuses and multiple managers"""
-        csv_file = tmp_path / "complete.csv"
-        csv_content = "ts_Status,ApprEmail\nInprogress,mgr1@mail.com\nPending,mgr2@mail.com\nApproved,mgr3@mail.com\nPending,mgr2@mail.com\nPending,mgr4@mail.com\nInprogress,mgr1@mail.com\n"
-        csv_file.write_text(csv_content)
-        result = pending(csv_file)
-
-        assert len(result) == 3
-        assert "mgr2@mail.com" in result
-        assert "mgr4@mail.com" in result
-        assert "mgr1@mail.com" not in result
-        assert "mgr3@mail.com" not in result

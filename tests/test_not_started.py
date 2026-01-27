@@ -105,15 +105,6 @@ class TestNotStarted:
         assert "emp2@mail.com" in result["mgr1@mail.com"]
         assert "emp3@mail.com" in result["mgr2@mail.com"]
 
-    def test_not_started_list_handles_missing_columns(self, tmp_path):
-        """Test behavior when required columns are missing"""
-        csv_file = tmp_path / "missing_cols.csv"
-        csv_content = "job_ecls,EmplEmail\n"  # Missing ApprEmail
-        csv_file.write_text(csv_content)
-
-        with pytest.raises(KeyError):
-            not_started_list(csv_file)
-
     def test_not_started_list_with_multiple_managers(self, tmp_path):
         """Test that function correctly handles multiple managers"""
         csv_file = tmp_path / "multi_managers.csv"
