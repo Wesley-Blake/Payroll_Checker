@@ -17,7 +17,6 @@ def overlapping_hours(file: Path) -> dict[str,list[str]]:
     white_list = ['REG', 'SHF', 'HOL', 'HLW']
 
     final_df = df[~df['earn_code'].isin(white_list)]
-    print(final_df)
 
     if final_df.empty:
         logger.info('No overlapping hours.')
