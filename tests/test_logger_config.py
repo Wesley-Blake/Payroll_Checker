@@ -1,3 +1,4 @@
+import os
 import pytest
 from helpers.logger_config import setup_logger
 
@@ -6,6 +7,7 @@ class TestLoggerConfig:
     def test_setup_logger_returns_object(self):
         logger = setup_logger("test.log")
         assert logger is not None
+        os.remove("test.log")
 
     def test_setup_logger_is_logger(self):
         import logging
@@ -17,3 +19,5 @@ class TestLoggerConfig:
         logger2 = setup_logger("test2.log")
         assert logger1 is not None
         assert logger2 is not None
+        os.remove("test1.log")
+        os.remove("test2.log")
