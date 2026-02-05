@@ -1,10 +1,19 @@
 import os
 from pathlib import Path
+import textwrap
 from helpers.not_started import not_started_list
 from helpers.over_eight_hours import over_eight_hours
 from helpers.overlapping_hours import overlapping_hours
 from helpers.pending_status import pending
 from helpers.win32com_email import email
+
+def pay_period_check() -> str:
+    pay_periods = [str(x) for x in range(1,27)]
+    while True:
+        result = input("What pay period is it? ")
+        correction = input(f"{result} is this correct? [Y/n] ")
+        if correction.lower() == 'n': continue
+        if result in pay_periods: return result
 
 def loading_bar(length, index=1, pre_fix = ''):
     BAR_LENGTH = 30
@@ -25,7 +34,7 @@ def main():
         raise ValueError
     DOWNLOADS = Path.home() / "Downloads"
 
-    PAY_PERIOD = input("Enter pay period: ")
+    PAY_PERIOD = pay_period_check()
     print("Starting file search:")
     NOT_STARTED = ""
     OVERTIME = ""
@@ -62,7 +71,7 @@ def main():
                 manager,
                 employee,
                 PAY_PERIOD,
-                f"""\
+                textwrap.dedent(f"""\
                 Hi,
 
                 Employee Action: Timesheet Not Started!
@@ -70,7 +79,7 @@ def main():
                 For Manager:
                 If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
                 They are BCC'd on this email, so there is no action needed on your part.
-                """
+                """)
             )
 
     # Overtime Check
@@ -84,7 +93,7 @@ def main():
                 manager,
                 employee,
                 PAY_PERIOD,
-                f"""\
+                textwrap.dedent(f"""\
                 Hi,
 
                 Employee Action: Overtime Not Allocated!
@@ -93,7 +102,7 @@ def main():
                 For Manager:
                 If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
                 They are BCC'd on this email, so there is no action needed on your part.
-                """
+                """)
             )
 
     # Overlapping Check
@@ -107,7 +116,7 @@ def main():
                 manager,
                 employee,
                 PAY_PERIOD,
-                f"""\
+                textwrap.dedent(f"""\
                 Hi,
 
                 Employee Action: Overlapping Hours!
@@ -116,7 +125,7 @@ def main():
                 For Manager:
                 If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
                 They are BCC'd on this email, so there is no action needed on your part.
-                """
+                """)
             )
 
     # Pending Check
@@ -128,12 +137,12 @@ def main():
             "",
             result_pending,
             PAY_PERIOD,
-            f"""\
+            textwrap.dedent(f"""\
             Hi,
 
             For Manager:
             You have employees in a pending status. Please approve them!
-            """
+            """)
         )
 
 
