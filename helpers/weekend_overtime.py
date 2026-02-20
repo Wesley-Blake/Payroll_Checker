@@ -49,9 +49,3 @@ def weekend_overtime(file: Path, file_email: Path) -> dict:
     target_list = worked_weekend_df["Empl_ID"]
     final_df = final_df[final_df["Empl_ID"].isin(target_list)].copy()
     return final_df
-
-
-if __name__ == '__main__':
-    file = Path("C:\\Users\\wblake1\\Documents\\.mycode\\Payroll-Checker\\tests\\data_examples\\hours-breakdown.csv")
-    email_file = Path("C:\\Users\\wblake1\\Documents\\.mycode\\Payroll-Checker\\tests\\data_examples\\emails.csv")
-    print(weekend_overtime(file, email_file))
