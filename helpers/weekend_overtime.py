@@ -1,12 +1,12 @@
 from pathlib import Path
 import validators
 import pandas as pd
-#from helpers.logger_config import setup_logger
-from logger_config import setup_logger
+from helpers.logger_config import setup_logger
 
 def weekend_overtime(file: Path, file_email: Path) -> dict:
     if file.is_file() and file_email.is_file():
         df = pd.read_csv(file)
+        email_df = pd.read_csv(file_email)
     else:
         return {}
 
@@ -48,4 +48,38 @@ def weekend_overtime(file: Path, file_email: Path) -> dict:
     worked_weekend_df = final_df.groupby("Empl_ID")['ts_entry_date'].nunique().reset_index(name='days_worked')
     target_list = worked_weekend_df["Empl_ID"]
     final_df = final_df[final_df["Empl_ID"].isin(target_list)].copy()
-    return final_df
+
+    #"Empl_ID", "appr_id", "earning_hours"
+    EMAIL_WHITE_LIST = [
+        "EmplID",
+        "PacificEmail",
+        "SupervisorEmail"
+    ]
+    ordered_email_df = email_df[EMAIL_WHITE_LIST].drop_duplicates()
+    merged_df = pd.merge(
+        final_df,
+        ordered_email_df,
+        left_on="Empl_ID",
+        right_on="EmplID",
+        how="inner"
+    )
+    headers = merged_df.columns
+
+    result: dict[str,list[str]] = {}
+    manager_emails: list[str] = merged_df[headers[-1]].unique().tolist()
+    for manager_email in manager_emails:
+        result.update({manager_email: []})
+        employee_email_df = merged_df[merged_df[headers[-1]] == manager_email][headers[-2]]
+        employee_email_list = employee_email_df.unique().tolist()
+        result[manager_email] += employee_email_list
+
+    for manager, employee in result.items():
+        if not validators.email(manager):
+            logger.debug("Manager email isn't email.")
+            return {}
+            for email in employee:
+                if not validators.email(email):
+                    logger.debug("Employee email isn't email.")
+                    return {}
+    logger.info("Finished Successfully.")
+    return result
