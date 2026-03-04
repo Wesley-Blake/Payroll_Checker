@@ -31,7 +31,7 @@ class TestNotStarted:
     # Return value structure tests
     def test_not_started_list_returns_manager_keys(self):
         """Test that result has manager emails as keys"""
-        result = not_started_list(Path("tests\\data_examples\\NotStarted.csv"))
+        result = not_started_list(Path("Payroll-Checker\\tests\\data_examples\\NotStarted.csv"))
         if result:  # Only test if result is not empty
             for key in result.keys():
                 assert isinstance(key, str)
@@ -39,7 +39,7 @@ class TestNotStarted:
 
     def test_not_started_list_returns_employee_lists(self):
         """Test that each manager maps to a list of employees"""
-        result = not_started_list(Path("tests\\data_examples\\NotStarted.csv"))
+        result = not_started_list(Path("Payroll-Checker\\tests\\data_examples\\NotStarted.csv"))
         if result:
             for manager, employees in result.items():
                 assert isinstance(employees, list)
@@ -56,23 +56,32 @@ class TestNotStarted:
                     f"Duplicate employees found for manager {manager}"
 
     # Filter tests
-    def test_not_started_list_filters_ss_status(self):
+    def test_not_started_list_filters_ss_status(self, tmp_path):
         """Test that employees with SS status are filtered out"""
-        result = not_started_list(Path("tests\\data_examples\\NotStarted.csv"))
-        # SS status should be filtered, so if result is empty, filtering worked
-        assert isinstance(result, dict)
+        csv_file = tmp_path / "test_ss.csv"
+        csv_content = "job_ecls,EmplEmail,ApprEmail\nSS,emp@mail.com,mgr@mail.com\n"
+        csv_file.write_text(csv_content)
+        result = not_started_list(csv_file)
+        # SS status should be filtered out
+        assert result == {}
 
-    def test_not_started_list_filters_sn_status(self):
+    def test_not_started_list_filters_sn_status(self, tmp_path):
         """Test that employees with SN status are filtered out"""
-        result = not_started_list(Path("tests\\data_examples\\NotStarted.csv"))
-        # SN status should be filtered
-        assert isinstance(result, dict)
+        csv_file = tmp_path / "test_sn.csv"
+        csv_content = "job_ecls,EmplEmail,ApprEmail\nSN,emp@mail.com,mgr@mail.com\n"
+        csv_file.write_text(csv_content)
+        result = not_started_list(csv_file)
+        # SN status should be filtered out
+        assert result == {}
 
-    def test_not_started_list_filters_ww_status(self):
+    def test_not_started_list_filters_ww_status(self, tmp_path):
         """Test that employees with WW status are filtered out"""
-        result = not_started_list(Path("tests\\data_examples\\NotStarted.csv"))
-        # WW status should be filtered
-        assert isinstance(result, dict)
+        csv_file = tmp_path / "test_ww.csv"
+        csv_content = "job_ecls,EmplEmail,ApprEmail\nWW,emp@mail.com,mgr@mail.com\n"
+        csv_file.write_text(csv_content)
+        result = not_started_list(csv_file)
+        # WW status should be filtered out
+        assert result == {}
 
     # Edge case tests
     def test_not_started_list_with_empty_csv(self, tmp_path):
@@ -98,6 +107,10 @@ class TestNotStarted:
         result = not_started_list(csv_file)
 
         assert "mgr1@mail.com" in result
+        assert "mgr2@mail.com" in result
+        assert len(result["mgr1@mail.com"]) == 2
+        assert "emp1@mail.com" in result["mgr1@mail.com"]
+        assert "emp2@mail.com" in result["mgr1@mail.com"]
         assert "mgr2@mail.com" in result
         assert len(result["mgr1@mail.com"]) == 2
         assert len(result["mgr2@mail.com"]) == 1

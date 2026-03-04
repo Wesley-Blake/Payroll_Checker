@@ -4,10 +4,12 @@ import pandas as pd
 from helpers.logger_config import setup_logger
 
 def weekend_overtime(file: Path, file_email: Path) -> dict:
+    logger = setup_logger("PayRollChecker.log")
     if file.is_file() and file_email.is_file():
         df = pd.read_csv(file)
         email_df = pd.read_csv(file_email)
     else:
+        logger.warning("One or both files do not exist.")
         return {}
 
     WHITE_LIST = ["ts_payno", "Empl_ID", "JobECLS", "earn_code", "ts_entry_date", "appr_id", "earning_hours"]

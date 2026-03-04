@@ -11,7 +11,7 @@ def not_started_list(file: Path) -> dict[str, list[str]]:
     if isinstance(file, Path) and file.is_file():
         df = pd.read_csv(file)
     else:
-        logger.error("Failed to create DataFream.")
+        logger.error("Failed to create DataFrame.")
         return {}
 
     final_df = df[
