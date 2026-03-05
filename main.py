@@ -6,7 +6,7 @@ from helpers.not_started import not_started_list
 from helpers.over_eight_hours import over_eight_hours
 from helpers.over_twelve_hours import over_twleve_hours
 from helpers.overlapping_hours import overlapping_hours
-from helpers.weekend_overtime import weekend_overtime
+#from helpers.weekend_overtime import weekend_overtime
 from helpers.pending_status import pending
 from helpers.win32com_email import email
 
@@ -89,7 +89,7 @@ def main():
     result_overtime = over_eight_hours(path_overtime, path_email)
     length = len(result_overtime)
     if  length > 0:
-        my_bar = loading_bar(length, pre_fix="Overitme Emails: ")
+        my_bar = loading_bar(length, pre_fix="Overitme Emails over 8 hours: ")
         for manager, employee in result_overtime.items():
             print(next(my_bar), end='', flush=True)
             email(
@@ -112,7 +112,7 @@ def main():
     result_over_twelve = over_twleve_hours(path_overtime, path_email)
     length = len(result_over_twelve)
     if length > 0:
-        my_bar = loading_bar(length, pre_fix="Overitme Emails: ")
+        my_bar = loading_bar(length, pre_fix="Overitme Emails over 12 hours: ")
         for manager, employee in result_over_twelve.items():
             print(next(my_bar), end='', flush=True)
             email(
@@ -156,29 +156,29 @@ def main():
             )
 
     # Weekend Overtime Not Allocated
-    result_weekend_overtime = weekend_overtime(path_overtime,path_email)
-    length = len(result_weekend_overtime)
-    if length > 0:
-        my_bar = loading_bar(length, pre_fix="Overlapping Hours Emails:")
-        for manager, employee in result_weekend_overtime.items():
-            print(next(my_bar), end='', flush=True)
-            email(
-                manager,
-                employee,
-                PAY_PERIOD,
-                textwrap.dedent(f"""\
-                Hi,
+    #result_weekend_overtime = weekend_overtime(path_overtime,path_email)
+    #length = len(result_weekend_overtime)
+    #if length > 0:
+    #    my_bar = loading_bar(length, pre_fix="Weekend Overtime Emails:")
+    #    for manager, employee in result_weekend_overtime.items():
+    #        print(next(my_bar), end='', flush=True)
+    #        email(
+    #            manager,
+    #            employee,
+    #            PAY_PERIOD,
+    #            textwrap.dedent(f"""\
+    #            Hi,
 
-                Employee Action: Weekend Overtime Not Allocated!
-                Union: if you had REG from Monday to Friday, Saturday and Sunday are Overtime by default.
-                Everyone else: if you worked 40 hours REG from Monday, everyting is Overtime by default.
-                https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
+    #            Employee Action: Weekend Overtime Not Allocated!
+    #            Union: if you had REG from Monday to Friday, Saturday and Sunday are Overtime by default.
+    #            Everyone else: if you worked 40 hours REG from Monday, everyting is Overtime by default.
+    #            https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
 
-                For Manager:
-                If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
-                They are BCC'd on this email, so there is no action needed on your part.
-                """)
-            )
+    #            For Manager:
+    #            If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
+    #            They are BCC'd on this email, so there is no action needed on your part.
+    #            """)
+    #        )
 
     # Pending Check
     result_pending = pending(path_pending)
