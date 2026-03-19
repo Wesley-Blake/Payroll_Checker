@@ -77,11 +77,13 @@ def main():
                 textwrap.dedent(f"""\
                 Hi,
 
-                Employee Action: Timesheet Not Started!
+                Friendly Reminder: Timesheet Not Started
 
-                For Manager:
-                If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
-                They are BCC'd on this email, so there is no action needed on your part.
+                Manager:
+                Hello! We wanted to let you know that {len(employee)} of your employees have not started their timesheet for the pay period {PAY_PERIOD}.
+                They've been BCC'd on this email as a helpful reminder, so no action is needed from you at this time.
+
+                Thanks so much, and have a great day!
                 """)
             )
 
@@ -99,13 +101,17 @@ def main():
                 textwrap.dedent(f"""\
                 Hi,
 
-                Employee Action: Overtime Not Allocated!
-                You have time that is greater than 8 (7.5 union) REG hours in a day.
-                https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
+                Friendly Reminder: Overtime Not Allocated
 
-                For Manager:
-                If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
-                They are BCC'd on this email, so there is no action needed on your part.
+                We wanted to let you know that you recorded more than 8 hours of regular (7.5 for union) time in a single day, and overtime has not yet been allocated.
+                For helpful guidance, you can review the overtime rules here: https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
+                Essentially, you should put 8 (7.5 union) in Regular Earnings, the rest goes in Overtime.
+
+                Manager Notification:
+                You're receiving this email because {len(employee)} of your employees haven't allocated Overtime for the pay period {PAY_PERIOD}.
+                They've been BCC'd on this message as a friendly reminder, so no action is needed from you at this time.
+
+                Thanks so much, and appreciate your support!
                 """)
             )
     # Over twelve hours in a day Overtime
@@ -122,13 +128,18 @@ def main():
                 textwrap.dedent(f"""\
                 Hi,
 
-                Employee Action: Overtime for over 12 hours worked not Allocated!
-                Any hours over 12 (REG + OT) is OT2 by default.
-                https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
+                Friendly Reminder: Overtime for Hours Over 12 Not Allocated
 
-                For Manager:
-                If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
-                They are BCC'd on this email, so there is no action needed on your part.
+                We wanted to share a quick reminder that any hours worked over 12 in a single day (regular + overtime) are automatically considered OT2 and may need to be allocated accordingly.
+                For more information, you can review the guidelines here: https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
+                Example:
+                    8 REG (7.5 unoin) + 4 OT (4.5 union) = 12 hours and everything else is in OT2.
+
+                Manager Notification:
+                You're receiving this email because {len(employee)} of your employees have a timesheet item to review for the pay period {PAY_PERIOD}.
+                They've been BCC'd on this message as a helpful reminder, so no action is needed from you at this time.
+
+                Thanks so much, and we appreciate your support!
                 """)
             )
 
@@ -146,12 +157,16 @@ def main():
                 textwrap.dedent(f"""\
                 Hi,
 
-                Employee Action: Overlapping Hours!
-                You have hours somewhere that are overlapping!
+                Friendly Reminder: Overlapping Hours
 
-                For Manager:
-                If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
-                They are BCC'd on this email, so there is no action needed on your part.
+                We noticed that there are some hours on your timesheet that overlap. This happens from time to time and can usually be resolved with a quick review.
+                Additionally, if you are using the Employee Services (new), the yellow (!) will tell you specifics.
+
+                Manager Notification:
+                You're receiving this email because {len(employee)} of your employees have a timesheet item to review for the pay period {PAY_PERIOD}.
+                They've been BCC'd on this message as a helpful reminder, so no action is needed from you at this time.
+
+                Thanks so much, and have a great day!
                 """)
             )
 
@@ -192,8 +207,11 @@ def main():
             textwrap.dedent(f"""\
             Hi,
 
-            For Manager:
-            You have employees in a pending status. Please approve them!
+            Manager Reminder: Pending Approvals
+
+            Just a quick heads-up that you have employees whose timesheets are currently in a pending status and ready for your approval when you have a moment.
+
+            Thanks so much for your time and support!
             """)
         )
 
