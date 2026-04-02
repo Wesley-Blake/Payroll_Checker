@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 import validators
 from helpers.logger_config import setup_logger
+#from helpers.email_list import *
 
 def not_started_list(file: Path) -> dict[str, list[str]]:
     logger = setup_logger("PayRollChecker.log")
@@ -23,6 +24,16 @@ def not_started_list(file: Path) -> dict[str, list[str]]:
         logger.info("All employees started.")
         return {}
 
+    # # Refactored code
+    # manager_emails = EmailList()
+
+    # manager_emails.append(final_df["ApprEmail"].unique().tolist())
+
+    # for manager_email in manager_emails.email_list:
+    #     result.update({manager_email: employee_email_list = EmailList()})
+    # # End Refactored code
+
+    # Refactor for EmailList datatype.
     manager_emails = final_df["ApprEmail"].unique().tolist()
 
     for manager_email in manager_emails:
@@ -39,6 +50,7 @@ def not_started_list(file: Path) -> dict[str, list[str]]:
             if not validators.email(email):
                 logger.error("Employee email isn't email.")
                 return {}
+    # End refector
 
     logger.info("Finished successfully.")
     return result
