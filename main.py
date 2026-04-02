@@ -78,6 +78,7 @@ def main():
                 Hi,
 
                 Friendly Reminder: Timesheet Not Started
+                Timesheets are due this friday!
 
                 Manager:
                 Hello! We wanted to let you know that {len(employee)} of your employees have not started their timesheet for the pay period {PAY_PERIOD}.
