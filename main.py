@@ -2,6 +2,10 @@ import os
 from pathlib import Path
 import textwrap
 from datetime import datetime
+from helpers.holiday_detection import holidays_input
+from helpers.holiday_detection import holiday_detection_type
+from helpers.holiday_detection import holiday_detection_date
+from helpers.holiday_detection import no_holiday_detection
 from helpers.not_started import not_started_list
 from helpers.over_eight_hours import over_eight_hours
 from helpers.over_twelve_hours import over_twleve_hours
@@ -63,6 +67,89 @@ def main():
     print("File search compelted!")
 
 
+    # Holiday Detections
+    if input("Is there a holiday? [Y/n]") == "n":
+        result_no_holiday = no_holiday_detection(path_overtime, path_email)
+        length = len(result_no_holiday)
+        if length > 0:
+            my_bar = loading_bar(length, pre_fix="No Holiday Email:")
+            for manager, employee in result_no_holiday.items():
+                print(next(my_bar), end='', flush=True)
+                email(
+                    manager,
+                    employee,
+                    PAY_PERIOD,
+                    textwrap.dedent(f"""\
+                    Hi,
+
+                    Friendly Reminder: Holiday / Holiday Worked was detected.
+                    There wasn't a holiday this pay period.
+
+                    Manager:
+                    Hello! We wanted to let you know that {len(employee)} of your employees have Holiday / Holiday Worked hours for the pay period {PAY_PERIOD}.
+                    They've been BCC'd on this email as a helpful reminder, so no action is needed from you at this time.
+
+                    Thanks so much, and have a great day!
+                    """)
+                )
+    else:
+        list_o_holidays = holidays_input()
+        if len(list_o_holidays) == 0:
+            SystemExit(f"{list_o_holidays=}\n is empty.")
+
+        result_holiday_type = holiday_detection_type(
+            path_overtime,
+            path_email,
+            list_o_holidays
+        )
+        length = len(result_holiday_type)
+        if length > 0:
+            my_bar = loading_bar(length, pre_fix="Holiday Type Email:")
+            for manager, employee in result_holiday_type.items():
+                print(next(my_bar), end='', flush=True)
+                email(
+                    manager,
+                    employee,
+                    PAY_PERIOD,
+                    textwrap.dedent(f"""\
+                    Hi,
+
+                    Friendly Reminder: Holiday / Holiday Worked was detected.
+                    Holiday and or Holiday Worked was reported on the incorrect day.
+                    {list_o_holidays=}
+
+                    Manager:
+                    Hello! We wanted to let you know that {len(employee)} of your employees have entered Holiday or Holiday Worked on the incorrect day for the pay period {PAY_PERIOD}.
+                    They've been BCC'd on this email as a helpful reminder, so no action is needed from you at this time.
+
+                    Thanks so much, and have a great day!
+                    """)
+                )
+        result_holiday_date = holiday_detection_date(path_overtime, path_email, list_o_holidays)
+        length = len(result_holiday_date)
+        if length > 0:
+            my_bar = loading_bar(length, pre_fix="Holiday Date Email:")
+            for manager, employee in result_holiday_date.items():
+                print(next(my_bar), end='', flush=True)
+                email(
+                    manager,
+                    employee,
+                    PAY_PERIOD,
+                    textwrap.dedent(f"""\
+                    Hi,
+
+                    Friendly Reminder: Holiday / Holiday Worked was detected.
+                    Holiday Pay doesn't reflect on the holiday.
+                    {list_o_holidays=}
+
+                    Manager:
+                    Hello! We wanted to let you know that {len(employee)} of your employees have didn't report Holiday Pay for the pay period {PAY_PERIOD}.
+                    They've been BCC'd on this email as a helpful reminder, so no action is needed from you at this time.
+
+                    Thanks so much, and have a great day!
+                    """)
+                )
+
     # Not Started Check
     result_not_started = not_started_list(path_not_started)
     length = len(result_not_started)
@@ -115,6 +202,7 @@ def main():
                 Thanks so much, and appreciate your support!
                 """)
             )
+
     # Over twelve hours in a day Overtime
     result_over_twelve = over_twleve_hours(path_overtime, path_email)
     length = len(result_over_twelve)
