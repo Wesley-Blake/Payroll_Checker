@@ -5,6 +5,7 @@ from datetime import datetime
 from helpers.logger_config import setup_logger
 
 def return_dict(merged_df) -> dict[str:list[str]]:
+    logger = setup_logger("PayRollChecker.log")
     headers = merged_df.columns
     result: dict[str,list[str]] = {}
     manager_emails: list[str] = merged_df[headers[-1]].unique().tolist()
