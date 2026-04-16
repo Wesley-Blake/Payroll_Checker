@@ -79,9 +79,9 @@ def weekend_overtime(file: Path, file_email: Path) -> dict:
         if not validators.email(manager):
             logger.debug("Manager email isn't email.")
             return {}
-            for email in employee:
-                if not validators.email(email):
-                    logger.debug("Employee email isn't email.")
-                    return {}
+        for email in employee:
+            if not validators.email(email):
+                logger.debug("Employee email isn't email.")
+                return {}
     logger.info("Finished Successfully.")
     return result
