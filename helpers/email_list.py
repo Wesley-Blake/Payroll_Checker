@@ -16,7 +16,7 @@ class EmailList:
         #    pass
     @property
     def email_list(self):
-        return self.__email_list
+        return self.__email_list.copy()
 
     def append(self, email_input):
         if isinstance(email_input, str):
