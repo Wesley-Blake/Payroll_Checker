@@ -47,12 +47,12 @@ class TestOverEightHours:
         hours_file = tmp_path / "hours.csv"
         hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,UU,OT,2026-01-01,1,10"
         hours_file.write_text(hours_content)
-        
+
         # Create emails CSV
         emails_file = tmp_path / "emails.csv"
         emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,mgr@mail.com"
         emails_file.write_text(emails_content)
-        
+
         result = over_eight_hours(hours_file, emails_file)
         assert result == {}
 
@@ -61,11 +61,11 @@ class TestOverEightHours:
         hours_file = tmp_path / "hours.csv"
         hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,UU,REG,2026-01-01,1,7"
         hours_file.write_text(hours_content)
-        
+
         emails_file = tmp_path / "emails.csv"
         emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,mgr@mail.com"
         emails_file.write_text(emails_content)
-        
+
         result = over_eight_hours(hours_file, emails_file)
         assert result == {}
 
@@ -74,11 +74,11 @@ class TestOverEightHours:
         hours_file = tmp_path / "hours.csv"
         hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,XX,REG,2026-01-01,1,7.5"
         hours_file.write_text(hours_content)
-        
+
         emails_file = tmp_path / "emails.csv"
         emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,mgr@mail.com"
         emails_file.write_text(emails_content)
-        
+
         result = over_eight_hours(hours_file, emails_file)
         assert result == {}
 
@@ -87,11 +87,11 @@ class TestOverEightHours:
         hours_file = tmp_path / "hours.csv"
         hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,UU,REG,2026-01-01,1,8"
         hours_file.write_text(hours_content)
-        
+
         emails_file = tmp_path / "emails.csv"
         emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,mgr@mail.com"
         emails_file.write_text(emails_content)
-        
+
         result = over_eight_hours(hours_file, emails_file)
         assert isinstance(result, dict)
         assert "mgr@mail.com" in result
@@ -102,11 +102,11 @@ class TestOverEightHours:
         hours_file = tmp_path / "hours.csv"
         hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,VV,REG,2026-01-01,1,8"
         hours_file.write_text(hours_content)
-        
+
         emails_file = tmp_path / "emails.csv"
         emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,mgr@mail.com"
         emails_file.write_text(emails_content)
-        
+
         result = over_eight_hours(hours_file, emails_file)
         assert isinstance(result, dict)
         assert "mgr@mail.com" in result
@@ -116,11 +116,11 @@ class TestOverEightHours:
         hours_file = tmp_path / "hours.csv"
         hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,XX,REG,2026-01-01,1,8.5"
         hours_file.write_text(hours_content)
-        
+
         emails_file = tmp_path / "emails.csv"
         emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,mgr@mail.com"
         emails_file.write_text(emails_content)
-        
+
         result = over_eight_hours(hours_file, emails_file)
         assert isinstance(result, dict)
         assert "mgr@mail.com" in result
@@ -131,11 +131,11 @@ class TestOverEightHours:
         hours_file = tmp_path / "hours.csv"
         hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test1,UU,REG,2026-01-01,1,8\n2,Test2,UU,REG,2026-01-01,1,8"
         hours_file.write_text(hours_content)
-        
+
         emails_file = tmp_path / "emails.csv"
         emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp1@mail.com,mgr@mail.com\n2,emp2@mail.com,mgr@mail.com"
         emails_file.write_text(emails_content)
-        
+
         result = over_eight_hours(hours_file, emails_file)
         assert "mgr@mail.com" in result
         assert len(result["mgr@mail.com"]) == 2
@@ -147,37 +147,37 @@ class TestOverEightHours:
         hours_file = tmp_path / "hours.csv"
         hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test1,UU,REG,2026-01-01,1,8\n2,Test2,UU,REG,2026-01-01,1,8"
         hours_file.write_text(hours_content)
-        
+
         emails_file = tmp_path / "emails.csv"
         emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp1@mail.com,mgr1@mail.com\n2,emp2@mail.com,mgr2@mail.com"
         emails_file.write_text(emails_content)
-        
+
         result = over_eight_hours(hours_file, emails_file)
         assert "mgr1@mail.com" in result
         assert "mgr2@mail.com" in result
 
     def test_over_eight_hours_invalid_manager_email(self, tmp_path):
         """Test that invalid manager email returns empty dict"""
-        hours_file = tmp_path / "hours.csv"
-        hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,UU,REG,2026-01-01,1,8"
-        hours_file.write_text(hours_content)
-        
-        emails_file = tmp_path / "emails.csv"
-        emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,invalid_manager"
-        emails_file.write_text(emails_content)
-        
-        result = over_eight_hours(hours_file, emails_file)
-        assert result == {}
+        with pytest.raises(ValueError):
+            hours_file = tmp_path / "hours.csv"
+            hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,UU,REG,2026-01-01,1,8"
+            hours_file.write_text(hours_content)
+
+            emails_file = tmp_path / "emails.csv"
+            emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,invalid_manager"
+            emails_file.write_text(emails_content)
+
+            result = over_eight_hours(hours_file, emails_file)
 
     def test_over_eight_hours_no_matching_employees_in_email_file(self, tmp_path):
         """Test that employees not in email file are not included"""
         hours_file = tmp_path / "hours.csv"
         hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n999,Test,UU,REG,2026-01-01,1,8"
         hours_file.write_text(hours_content)
-        
+
         emails_file = tmp_path / "emails.csv"
         emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,mgr@mail.com"
         emails_file.write_text(emails_content)
-        
+
         result = over_eight_hours(hours_file, emails_file)
         assert result == {}

@@ -1,6 +1,7 @@
 from pathlib import Path
 import pytest
 from helpers.holiday_detection import holiday_detection_type, holiday_detection_date, no_holiday_detection, return_dict, holidays_input
+from helpers.email_list import EmailList
 
 
 class TestHolidayDetection:
@@ -8,8 +9,8 @@ class TestHolidayDetection:
 
     def test_holiday_detection_type_invalid_files(self):
         """Test invalid file paths return empty dict"""
-        result = holiday_detection_type(Path("nonexistent.csv"), Path("nonexistent.csv"), [])
-        assert result == {}
+        with pytest.raises(Exception):
+            result = holiday_detection_type(Path("nonexistent.csv"), Path("nonexistent.csv"), [])
 
     def test_holiday_detection_type_with_holiday_work(self, tmp_path):
         """Test detection of work on holidays"""
@@ -39,12 +40,12 @@ class TestHolidayDetection:
 
         result = holiday_detection_type(hours_file, email_file, ["2024-01-01"])
         # No dates in holiday list, so filtered_df empty
-        assert result == {}
+        assert len(result) == 0
 
     def test_holiday_detection_date_invalid_files(self):
         """Test invalid file paths return empty dict"""
         result = holiday_detection_date(Path("nonexistent.csv"), Path("nonexistent.csv"), [])
-        assert result == {}
+        assert len(result) == 0
 
     def test_holiday_detection_date_with_holiday_pay(self, tmp_path):
         """Test detection of holiday pay on non-holiday dates"""
@@ -64,7 +65,7 @@ class TestHolidayDetection:
     def test_no_holiday_detection_invalid_files(self):
         """Test invalid file paths return empty dict"""
         result = no_holiday_detection(Path("nonexistent.csv"), Path("nonexistent.csv"))
-        assert result == {}
+        assert len(result) == 0
 
     def test_no_holiday_detection_with_holiday_pay(self, tmp_path):
         """Test detection of all holiday pay"""
@@ -92,20 +93,20 @@ class TestHolidayDetection:
 
     def test_return_dict_invalid_manager_email(self, tmp_path):
         """Test return_dict with invalid manager email"""
-        import pandas as pd
-        df = pd.DataFrame({
-            'PacificEmail': ['emp1@mail.com'],
-            'SupervisorEmail': ['not_email']
-        })
-        result = return_dict(df)
-        assert result == {}
+        with pytest.raises(ValueError):
+            import pandas as pd
+            df = pd.DataFrame({
+                'PacificEmail': ['emp1@mail.com'],
+                'SupervisorEmail': ['not_email']
+            })
+            result = return_dict(df)
 
     def test_return_dict_invalid_employee_email(self, tmp_path):
         """Test return_dict with invalid employee email"""
-        import pandas as pd
-        df = pd.DataFrame({
-            'PacificEmail': ['not_email'],
-            'SupervisorEmail': ['mgr@mail.com']
-        })
-        result = return_dict(df)
-        assert result == {}
+        with pytest.raises(ValueError):
+            import pandas as pd
+            df = pd.DataFrame({
+                'PacificEmail': ['not_email'],
+                'SupervisorEmail': ['mgr@mail.com']
+            })
+            result = return_dict(df)

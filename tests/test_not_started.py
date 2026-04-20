@@ -134,15 +134,13 @@ class TestNotStarted:
         csv_file = tmp_path / "invalid_mgr.csv"
         csv_content = "job_ecls,EmplEmail,ApprEmail\nACTIVE,emp1@mail.com,not_an_email\n"
         csv_file.write_text(csv_content)
-        result = not_started_list(csv_file)
-
-        assert result == {}
+        with pytest.raises(ValueError):
+            not_started_list(csv_file)
 
     def test_not_started_list_invalid_employee_email(self, tmp_path):
         """Test that invalid employee email causes function to return empty dict"""
         csv_file = tmp_path / "invalid_emp.csv"
         csv_content = "job_ecls,EmplEmail,ApprEmail\nACTIVE,not_an_email,mgr@mail.com\n"
         csv_file.write_text(csv_content)
-        result = not_started_list(csv_file)
-
-        assert result == {}
+        with pytest.raises(ValueError):
+            not_started_list(csv_file)

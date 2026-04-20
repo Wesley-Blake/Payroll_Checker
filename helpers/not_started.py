@@ -1,19 +1,18 @@
 from pathlib import Path
 import logging
 import pandas as pd
-import validators
 from helpers.logger_config import setup_logger
-#from helpers.email_list import *
+from helpers.email_list import EmailList
 
-def not_started_list(file: Path) -> dict[str, list[str]]:
+def not_started_list(file: Path) -> EmailList[str, list[str]]:
     logger = setup_logger("PayRollChecker.log")
+    email_list = EmailList()
 
-    result = {}
     if isinstance(file, Path) and file.is_file():
         df = pd.read_csv(file)
     else:
         logger.error("Failed to create DataFrame.")
-        return {}
+        return email_list
 
     final_df = df[
         (df["job_ecls"] != "SS") &
@@ -22,35 +21,15 @@ def not_started_list(file: Path) -> dict[str, list[str]]:
     ]
     if final_df.empty:
         logger.info("All employees started.")
-        return {}
+        return email_list
 
-    # # Refactored code
-    # manager_emails = EmailList()
-
-    # manager_emails.append(final_df["ApprEmail"].unique().tolist())
-
-    # for manager_email in manager_emails.email_list:
-    #     result.update({manager_email: employee_email_list = EmailList()})
-    # # End Refactored code
-
-    # Refactor for EmailList datatype.
     manager_emails = final_df["ApprEmail"].unique().tolist()
 
     for manager_email in manager_emails:
-        result.update({manager_email: []})
+        email_list.update({manager_email: []})
         employee_email_df = final_df[final_df["ApprEmail"] == manager_email]["EmplEmail"]
         employee_email_list = employee_email_df.unique().tolist()
-        result[manager_email] += employee_email_list
-
-    for manager, employee in result.items():
-        if not validators.email(manager):
-            logger.error("Manager email isn't email.")
-            return {}
-        for email in employee:
-            if not validators.email(email):
-                logger.error("Employee email isn't email.")
-                return {}
-    # End refector
+        email_list[manager_email] += employee_email_list
 
     logger.info("Finished successfully.")
-    return result
+    return email_list

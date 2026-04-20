@@ -3,11 +3,12 @@ import pandas as pd
 import validators
 from datetime import datetime
 from helpers.logger_config import setup_logger
+from helpers.email_list import EmailList
 
-def return_dict(merged_df) -> dict[str:list[str]]:
+def return_dict(merged_df) -> EmailList[str:list[str]]:
     logger = setup_logger("PayRollChecker.log")
     headers = merged_df.columns
-    result: dict[str,list[str]] = {}
+    result = EmailList()
     manager_emails: list[str] = merged_df[headers[-1]].unique().tolist()
     for manager_email in manager_emails:
         result.update({manager_email: []})
@@ -15,15 +16,6 @@ def return_dict(merged_df) -> dict[str:list[str]]:
         employee_email_list = employee_email_df.unique().tolist()
         result[manager_email] += employee_email_list
 
-    # Validate all emails
-    for manager, employee in result.items():
-        if not validators.email(manager):
-            logger.debug("Manager email isn't email.")
-            return {}
-        for email in employee:
-            if not validators.email(email):
-                logger.debug("Employee email isn't email.")
-                return {}
     logger.info("Finished Successfully.")
     return result
 

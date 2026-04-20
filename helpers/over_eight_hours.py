@@ -7,15 +7,16 @@ import pandas as pd
 from pathlib import Path
 import validators
 from helpers.logger_config import setup_logger
+from helpers.email_list import EmailList
 
 
 def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]:
     """Find employees exceeding 8 hours by manager.
-    
+
     Args:
         file_hours: Path to hours breakdown CSV
         file_email: Path to employee email CSV
-        
+
     Returns:
         Dict mapping manager email to list of employee emails, or empty dict.
     """
@@ -84,7 +85,7 @@ def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]
     headers = merged_df.columns
 
     # Build result dict: manager -> [employees]
-    result: dict[str,list[str]] = {}
+    result = EmailList()
     manager_emails: list[str] = merged_df[headers[-1]].unique().tolist()
     for manager_email in manager_emails:
         result.update({manager_email: []})
@@ -92,14 +93,5 @@ def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]
         employee_email_list = employee_email_df.unique().tolist()
         result[manager_email] += employee_email_list
 
-    # Validate all emails
-    for manager, employee in result.items():
-        if not validators.email(manager):
-            logger.debug("Manager email isn't email.")
-            return {}
-            for email in employee:
-                if not validators.email(email):
-                    logger.debug("Employee email isn't email.")
-                    return {}
     logger.info("Finished Successfully.")
     return result

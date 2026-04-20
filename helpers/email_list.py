@@ -1,39 +1,21 @@
 import validators
 
-class EmailError(Exception):
-    print("Email wasn't an email.")
+class EmailList(dict):
+    def __setitem__(self, key, value):
+        if not validators.email(key):
+            raise ValueError(f"Invalid email address: {key}")
+        if not isinstance(value, list) or not all(validators.email(email) for email in value):
+            raise ValueError(f"Value must be a list of valid email addresses: {value}")
+        super().__setitem__(key, value)
 
-class EmailList:
-    def __init__(self):
-        self.__email_list = []
-        #if isinstance(email_list, list):
-        #    for email in email_list:
-        #        if validators.email(email):
-        #            self.__email_list.append(email)
-        #        else:
-        #            raise EmailError
-        #else:
-        #    pass
-    @property
-    def email_list(self):
-        return self.__email_list.copy()
 
-    def append(self, email_input):
-        if isinstance(email_input, str):
-            if validators.email(email_input):
-                self.__email_list.append(email_input)
-            else:
-                raise EmailError
-        if isinstance(email_input, list):
-            for email in email_input:
-                if validators.email(email):
-                    self.__email_list.append(email)
-                else:
-                    raise EmailError
+if __name__ == "__main__":
+    email_list = EmailList()
+    #email_list["test1@example.com"] = ["test2@example.com", "test3@example.com"]
+    email_list.update({"test1@example.com": []})
+    email_list.update({"test1@example.com": ["test2@example.com", "test3@example.com"]})
+    email_list["test1@example.com"] += ["test2@example.com", "test3@example.com"]
 
-if __name__ == '__main__':
-    test = EmailList()
-    print(test.email_list)
-
-    test.append(['test@mail.com', 'other@mail.com'])
-    print(test.email_list)
+    print(email_list)
+    email_list = EmailList()
+    print(len(email_list))
