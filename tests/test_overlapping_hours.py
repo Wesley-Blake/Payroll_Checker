@@ -45,19 +45,19 @@ class TestOverlappingHours:
 
     def test_overlapping_hours_invalid_manager_email(self, tmp_path):
         """Test that invalid manager email returns empty dict"""
-        csv_file = tmp_path / "test_invalid_mgr.csv"
-        csv_content = "earn_code,Empl_Email,Appr_Email\nOT,emp1@mail.com,not_email\n"
-        csv_file.write_text(csv_content)
-        result = overlapping_hours(csv_file)
-        assert result == {}
+        with pytest.raises(ValueError):
+            csv_file = tmp_path / "test_invalid_mgr.csv"
+            csv_content = "earn_code,Empl_Email,Appr_Email\nOT,emp1@mail.com,not_email\n"
+            csv_file.write_text(csv_content)
+            result = overlapping_hours(csv_file)
 
     def test_overlapping_hours_invalid_employee_email(self, tmp_path):
         """Test that invalid employee email returns empty dict"""
-        csv_file = tmp_path / "test_invalid_emp.csv"
-        csv_content = "earn_code,Empl_Email,Appr_Email\nOT,not_email,mgr@mail.com\n"
-        csv_file.write_text(csv_content)
-        result = overlapping_hours(csv_file)
-        assert result == {}
+        with pytest.raises(ValueError):
+            csv_file = tmp_path / "test_invalid_emp.csv"
+            csv_content = "earn_code,Empl_Email,Appr_Email\nOT,not_email,mgr@mail.com\n"
+            csv_file.write_text(csv_content)
+            result = overlapping_hours(csv_file)
 
     def test_overlapping_hours_empty_after_filter(self, tmp_path):
         """Test that empty df after filtering returns empty dict"""

@@ -139,16 +139,16 @@ class TestOverTwelveHours:
 
     def test_over_twelve_hours_invalid_manager_email(self, tmp_path):
         """Test that invalid manager email returns empty dict"""
-        hours_file = tmp_path / "hours.csv"
-        hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,XX,REG,2026-01-01,1,13"
-        hours_file.write_text(hours_content)
+        with pytest.raises(ValueError):
+            hours_file = tmp_path / "hours.csv"
+            hours_content = "Empl_ID,LastName,JobECLS,earn_code,ts_entry_date,appr_id,earning_hours\n1,Test,XX,REG,2026-01-01,1,13"
+            hours_file.write_text(hours_content)
 
-        emails_file = tmp_path / "emails.csv"
-        emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,invalid_manager"
-        emails_file.write_text(emails_content)
+            emails_file = tmp_path / "emails.csv"
+            emails_content = "EmplID,PacificEmail,SupervisorEmail\n1,emp@mail.com,invalid_manager"
+            emails_file.write_text(emails_content)
 
-        result = over_twleve_hours(hours_file, emails_file)
-        assert result == {}
+            result = over_twleve_hours(hours_file, emails_file)
 
     def test_over_twelve_hours_earn_code_replacement_reg(self, tmp_path):
         """Test that REG earn code is replaced with REG&OT"""

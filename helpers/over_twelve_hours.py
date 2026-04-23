@@ -7,15 +7,16 @@ from pathlib import Path
 import pandas as pd
 import validators
 from helpers.logger_config import setup_logger
+from helpers.email_list import EmailList
 
 
-def over_twleve_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]:
+def over_twleve_hours(file_hours: Path, file_email: Path) -> EmailList:
     """Find employees exceeding 12 hours by manager.
-    
+
     Args:
         file_hours: Path to hours breakdown CSV
         file_email: Path to employee email CSV
-        
+
     Returns:
         Dict mapping manager email to list of employee emails, or empty dict.
     """
@@ -25,7 +26,7 @@ def over_twleve_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]
     if not isinstance(file_hours, Path) or not isinstance(file_email, Path):
         logger.error("Invalid file path(s) provided.")
         return {}
-    
+
     # Validate input files exist
     if file_hours.is_file() and file_email.is_file():
         df = pd.read_csv(file_hours)
@@ -51,7 +52,7 @@ def over_twleve_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]
             "OT":"REG&OT"
         }
     )
-    
+
     # Aggregate hours by employee and filter by threshold
     filtered_df = new_order_df.groupby(
         WHITE_LIST[:-1],
@@ -83,7 +84,7 @@ def over_twleve_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]
     headers = merged_df.columns
 
     # Build result dict: manager -> [employees]
-    result: dict[str,list[str]] = {}
+    result = EmailList()
     manager_emails: list[str] = merged_df[headers[-1]].unique().tolist()
     for manager_email in manager_emails:
         result.update({manager_email: []})
@@ -91,14 +92,5 @@ def over_twleve_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]
         employee_email_list = employee_email_df.unique().tolist()
         result[manager_email] += employee_email_list
 
-    # Validate all emails
-    for manager, employee in result.items():
-        if not validators.email(manager):
-            logger.debug("Manager email isn't email.")
-            return {}
-            for email in employee:
-                if not validators.email(email):
-                    logger.debug("Employee email isn't email.")
-                    return {}
     logger.info("Finished Successfully.")
     return result

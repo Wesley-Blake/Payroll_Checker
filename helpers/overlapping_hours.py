@@ -3,11 +3,11 @@ import logging
 import pandas as pd
 import validators
 from helpers.logger_config import setup_logger
+from helpers.email_list import EmailList
 
-def overlapping_hours(file: Path) -> dict[str,list[str]]:
+def overlapping_hours(file: Path) -> EmailList:
     logger = setup_logger('PayRollChecker.log')
 
-    result = {}
     if isinstance(file, Path) and file.is_file():
         df = pd.read_csv(file)
     else:
@@ -22,6 +22,7 @@ def overlapping_hours(file: Path) -> dict[str,list[str]]:
         logger.info('No overlapping hours.')
         return {}
 
+    result = EmailList()
     manager_emails = final_df['Appr_Email'].unique().tolist()
 
     for manager_email in manager_emails:
@@ -29,15 +30,6 @@ def overlapping_hours(file: Path) -> dict[str,list[str]]:
         employee_email_df = final_df[final_df['Appr_Email'] == manager_email]['Empl_Email']
         employee_email_list = employee_email_df.unique().tolist()
         result[manager_email] += employee_email_list
-
-    for manager, employee in result.items():
-        if not validators.email(manager):
-            logger.error("Manager email isn't email.")
-            return {}
-        for email in employee:
-            if not validators.email(email):
-                logger.error("Employee email isn't email.")
-                return {}
 
     logger.info('Finished successfully.')
     return result
