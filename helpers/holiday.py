@@ -28,14 +28,18 @@ def holiday_detection_type(file: DataFrame, file_email: DataFrame, hol_list: lis
     ]
     new_order_df = file[WHITE_LIST]
     filtered_df = new_order_df[new_order_df["ts_entry_date"].isin(hol_list)]
-    if filtered_df.empty: return {}
+    if filtered_df.empty:
+        logger.info("No holiday entries found.")
+        return {}
 
     filter_holiday = (
         (filtered_df[WHITE_LIST[3]] == "HOL") |
         (filtered_df[WHITE_LIST[3]] == "HLW")
     )
     final_df = filtered_df[~filter_holiday]
-    if final_df.empty: return {}
+    if final_df.empty:
+        logger.info("No non-holiday entries found.")
+        return {}
 
     EMAIL_WHITE_LIST = [
         "EmplID",
@@ -50,6 +54,7 @@ def holiday_detection_type(file: DataFrame, file_email: DataFrame, hol_list: lis
         right_on="EmplID",
         how="inner"
     )
+    logger.info(f"Holiday detection completed. Found {len(merged_df)} entries.")
     return return_dict(merged_df)
 
 def holiday_detection_date(file: DataFrame, file_email: DataFrame, hol_list: list) -> EmailList[str:list[str]]:
@@ -69,10 +74,14 @@ def holiday_detection_date(file: DataFrame, file_email: DataFrame, hol_list: lis
         (new_order_df[WHITE_LIST[3]] == "HLW")
     )
     filtered_df = new_order_df[filter_holiday]
-    if filtered_df.empty: return {}
+    if filtered_df.empty:
+        logger.info("No holiday entries found.")
+        return {}
 
     final_df = filtered_df[~filtered_df["ts_entry_date"].isin(hol_list)]
-    if final_df.empty: return {}
+    if final_df.empty:
+        logger.info("No non-holiday entries found.")
+        return {}
 
     EMAIL_WHITE_LIST = [
         "EmplID",
@@ -87,6 +96,7 @@ def holiday_detection_date(file: DataFrame, file_email: DataFrame, hol_list: lis
         right_on="EmplID",
         how="inner"
     )
+    logger.info(f"Holiday detection completed. Found {len(merged_df)} entries.")
     return return_dict(merged_df)
 
 def no_holiday_detection(file: DataFrame, file_email: DataFrame) -> EmailList[str:list[str]]:
@@ -106,7 +116,9 @@ def no_holiday_detection(file: DataFrame, file_email: DataFrame) -> EmailList[st
         (new_order_df[WHITE_LIST[3]] == "HLW")
     )
     final_df = new_order_df[filter_holiday]
-    if final_df.empty: return {}
+    if final_df.empty:
+        logger.info("No holiday entries found.")
+        return {}
 
     EMAIL_WHITE_LIST = [
         "EmplID",
@@ -121,4 +133,5 @@ def no_holiday_detection(file: DataFrame, file_email: DataFrame) -> EmailList[st
         right_on="EmplID",
         how="inner"
     )
+    logger.info(f"Holiday detection completed. Found {len(merged_df)} entries.")
     return return_dict(merged_df)

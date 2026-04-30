@@ -2,6 +2,7 @@ import pandas
 from pandas import DataFrame
 from helpers.support import *
 
+
 def over_eight_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[str, list[str]]:
     logger = setup_logger("PayRollChecker.log")
     WHITE_LIST = [
@@ -51,6 +52,7 @@ def over_eight_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[
         right_on="EmplID",
         how="inner"
     )
+    logger.info(f"Found {len(merged_df)} employees with excessive hours.")
     return return_dict(merged_df)
 
 def over_twleve_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[str, list[str]]:
@@ -95,4 +97,5 @@ def over_twleve_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList
         right_on="EmplID",
         how="inner"
     )
+    logger.info(f"Found {len(merged_df)} employees with excessive hours.")
     return return_dict(merged_df)

@@ -5,6 +5,7 @@ from pandas import DataFrame
 import validators
 import win32com.client as win32
 
+
 class EmailList(dict):
     def __setitem__(self, key, value):
         if not validators.email(key):
@@ -57,9 +58,14 @@ def make_df(file: Path, pay_period: int) -> DataFrame:
     else:
         raise ValueError(f"Pay period {pay_period} not found in file {file.name}")
 
+# NOTE: pass logger?
 def return_dict(merged_df: DataFrame) -> EmailList[str:list[str]]:
     logger = setup_logger("PayRollChecker.log")
     headers = merged_df.columns
+    if "appr" not in headers[-1].lower() and "super" not in headers[-1].lower():
+        raise ValueError(f"Last column must be manager email, found {headers[-1]}")
+    if "empl" not in headers[-2].lower() and "pacific" not in headers[-2].lower():
+        raise ValueError(f"Last column must be employee email, found {headers[-2]}")
     result = EmailList()
     manager_emails: list[str] = merged_df[headers[-1]].unique().tolist()
     for manager_email in manager_emails:
