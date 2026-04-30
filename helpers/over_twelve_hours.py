@@ -5,12 +5,13 @@ Returns dict mapping manager emails to lists of employee emails.
 """
 from pathlib import Path
 import pandas as pd
+from pandas import DataFrame
 import validators
 from helpers.logger_config import setup_logger
 from helpers.email_list import EmailList
 
 
-def over_twleve_hours(file_hours: Path, file_email: Path) -> EmailList:
+def over_twleve_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList:
     """Find employees exceeding 12 hours by manager.
 
     Args:
@@ -22,18 +23,6 @@ def over_twleve_hours(file_hours: Path, file_email: Path) -> EmailList:
     """
     logger = setup_logger("PayRollChecker.log")
 
-    # Validate inputs are Path objects
-    if not isinstance(file_hours, Path) or not isinstance(file_email, Path):
-        logger.error("Invalid file path(s) provided.")
-        return {}
-
-    # Validate input files exist
-    if file_hours.is_file() and file_email.is_file():
-        df = pd.read_csv(file_hours)
-    else:
-        logger.error("Failed to create DataFrame.")
-        return {}
-
     # Select columns and replace earn codes
     WHITE_LIST = [
         "Empl_ID",
@@ -44,7 +33,7 @@ def over_twleve_hours(file_hours: Path, file_email: Path) -> EmailList:
         "appr_id",
         "earning_hours"
     ]
-    new_order_df = df[WHITE_LIST]
+    new_order_df = file_hours[WHITE_LIST]
     # Combine REG and OT into single category
     new_order_df.loc[:,"earn_code"] = new_order_df["earn_code"].replace(
         {
@@ -67,7 +56,7 @@ def over_twleve_hours(file_hours: Path, file_email: Path) -> EmailList:
         return {}
 
     # Merge with email data and group by manager
-    email_df = pd.read_csv(file_email)
+    email_df = file_email
     EMAIL_WHITE_LIST = [
         "EmplID",
         "PacificEmail",

@@ -1,23 +1,18 @@
 from pathlib import Path
 import logging
 import pandas as pd
+from pandas import DataFrame
 from helpers.logger_config import setup_logger
 from helpers.email_list import EmailList
 
-def not_started_list(file: Path) -> EmailList[str, list[str]]:
+def not_started_list(file: DataFrame) -> EmailList[str, list[str]]:
     logger = setup_logger("PayRollChecker.log")
     email_list = EmailList()
 
-    if isinstance(file, Path) and file.is_file():
-        df = pd.read_csv(file)
-    else:
-        logger.error("Failed to create DataFrame.")
-        return email_list
-
-    final_df = df[
-        (df["job_ecls"] != "SS") &
-        (df["job_ecls"] != "SN") &
-        (df["job_ecls"] != "WW")
+    final_df = file[
+        (file["job_ecls"] != "SS") &
+        (file["job_ecls"] != "SN") &
+        (file["job_ecls"] != "WW")
     ]
     if final_df.empty:
         logger.info("All employees started.")

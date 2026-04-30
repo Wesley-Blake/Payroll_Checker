@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 import textwrap
 from datetime import datetime
+import pandas as pd
+from helpers.pay_detection import make_df
 from helpers.holiday_detection import holidays_input
 from helpers.holiday_detection import holiday_detection_type
 from helpers.holiday_detection import holiday_detection_date
@@ -13,14 +15,15 @@ from helpers.overlapping_hours import overlapping_hours
 #from helpers.weekend_overtime import weekend_overtime
 from helpers.pending_status import pending
 from helpers.win32com_email import email
+from helpers.pay_detection import make_df
 
-def pay_period_check() -> str:
+def pay_period_check() -> int:
     pay_periods = [str(x) for x in range(1,27)]
     while True:
         result = input("What pay period is it? ")
         correction = input(f"{result} is this correct? [Y/n] ")
         if correction.lower() == 'n': continue
-        if result in pay_periods: return result
+        if result in pay_periods: return int(result)
 
 def loading_bar(length, index=1, pre_fix = ''):
     BAR_LENGTH = 30
@@ -59,11 +62,11 @@ def main():
             OVERLAPPING = file.name
         elif "Time_Sheet_Status" in file.name and file.name > PENDING:
             PENDING = file.name
-    path_not_started =  DOWNLOADS / NOT_STARTED
-    path_overtime = DOWNLOADS / OVERTIME
-    path_email = DOWNLOADS / EMAIL
-    path_overlapping = DOWNLOADS / OVERLAPPING
-    path_pending = DOWNLOADS / PENDING
+    path_not_started =  make_df(DOWNLOADS / NOT_STARTED, PAY_PERIOD)
+    path_overtime = make_df(DOWNLOADS / OVERTIME, PAY_PERIOD)
+    path_email = pd.read_csv(DOWNLOADS / EMAIL)
+    path_overlapping = make_df(DOWNLOADS / OVERLAPPING, PAY_PERIOD)
+    path_pending = make_df(DOWNLOADS / PENDING, PAY_PERIOD)
     print("File search compelted!")
 
 

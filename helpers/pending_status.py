@@ -1,20 +1,13 @@
 import pandas as pd
+from pandas import DataFrame
 from pathlib import Path
 import validators
 from helpers.logger_config import setup_logger
 
-def pending(file: Path) -> list[str]:
+def pending(file: DataFrame) -> list[str]:
     logger = setup_logger("PayRollChecker.log")
-    if not isinstance(file, Path):
-        logger.error("Failed to create DataFrame.")
-        return []
-    if file.is_file():
-        df = pd.read_csv(file)
-    else:
-        logger.error("Failed to create DataFrame.")
-        return []
 
-    final_df = df[df["ts_Status"] == "Pending"]
+    final_df = file[file["ts_Status"] == "Pending"]
 
     if final_df.empty:
         logger.info("No employees in pending.")

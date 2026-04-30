@@ -1,22 +1,17 @@
 from pathlib import Path
 import logging
 import pandas as pd
+from pandas import DataFrame
 import validators
 from helpers.logger_config import setup_logger
 from helpers.email_list import EmailList
 
-def overlapping_hours(file: Path) -> EmailList:
+def overlapping_hours(file: DataFrame) -> EmailList:
     logger = setup_logger('PayRollChecker.log')
-
-    if isinstance(file, Path) and file.is_file():
-        df = pd.read_csv(file)
-    else:
-        logger.error('Failed to create DataFream.')
-        return {}
 
     white_list = ['REG', 'SHF', 'HOL', 'HLW']
 
-    final_df = df[~df['earn_code'].isin(white_list)]
+    final_df = file[~file['earn_code'].isin(white_list)]
 
     if final_df.empty:
         logger.info('No overlapping hours.')

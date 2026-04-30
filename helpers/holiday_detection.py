@@ -1,11 +1,12 @@
 from pathlib import Path
 import pandas as pd
+from pandas import DataFrame
 import validators
 from datetime import datetime
 from helpers.logger_config import setup_logger
 from helpers.email_list import EmailList
 
-def return_dict(merged_df) -> EmailList[str:list[str]]:
+def return_dict(merged_df: DataFrame) -> EmailList[str:list[str]]:
     logger = setup_logger("PayRollChecker.log")
     headers = merged_df.columns
     result = EmailList()
@@ -30,17 +31,9 @@ def holidays_input() -> list[str]:
             if len(holiday) == 0:
                 return holiday_list
 
-def holiday_detection_type(file: Path, file_email: Path, hol_list: list) -> dict[str:list[str]]:
+def holiday_detection_type(file: DataFrame, file_email: DataFrame, hol_list: list) -> dict[str:list[str]]:
     logger = setup_logger("PayRollChecker.log")
-    if not isinstance(file, Path) and not isinstance(file_email, Path):
-        logger.error(f"Bad file input type {type(file)=} {type(file_email)=}")
-        return {}
 
-    if file.is_file() and file_email.is_file():
-        df = pd.read_csv(file)
-    else:
-        logger.error("File doesn't exist!")
-        return {}
     WHITE_LIST = [
         "Empl_ID",
         "LastName",
@@ -50,7 +43,7 @@ def holiday_detection_type(file: Path, file_email: Path, hol_list: list) -> dict
         "appr_id",
         "earning_hours"
     ]
-    new_order_df = df[WHITE_LIST]
+    new_order_df = file[WHITE_LIST]
     filtered_df = new_order_df[new_order_df["ts_entry_date"].isin(hol_list)]
     if filtered_df.empty:
         return {}
@@ -61,7 +54,8 @@ def holiday_detection_type(file: Path, file_email: Path, hol_list: list) -> dict
     final_df = filtered_df[~filter_holiday]
     if final_df.empty:
         return {}
-    email_df = pd.read_csv(file_email)
+
+    email_df = file_email
     EMAIL_WHITE_LIST = [
         "EmplID",
         "PacificEmail",
@@ -77,17 +71,9 @@ def holiday_detection_type(file: Path, file_email: Path, hol_list: list) -> dict
     )
     return return_dict(merged_df)
 
-def holiday_detection_date(file: Path, file_email: Path, hol_list: list) -> dict[str:list[str]]:
+def holiday_detection_date(file: DataFrame, file_email: DataFrame, hol_list: list) -> dict[str:list[str]]:
     logger = setup_logger("PayRollChecker.log")
-    if not isinstance(file, Path) and not isinstance(file_email, Path):
-        logger.error(f"Bad file input type {type(file)=} {type(file_email)=}")
-        return {}
 
-    if file.is_file() and file_email.is_file():
-        df = pd.read_csv(file)
-    else:
-        logger.error("File doesn't exist!")
-        return {}
     WHITE_LIST = [
         "Empl_ID",
         "LastName",
@@ -97,7 +83,7 @@ def holiday_detection_date(file: Path, file_email: Path, hol_list: list) -> dict
         "appr_id",
         "earning_hours"
     ]
-    new_order_df = df[WHITE_LIST]
+    new_order_df = file[WHITE_LIST]
     filter_holiday = (
         (new_order_df[WHITE_LIST[3]] == "HOL") |
         (new_order_df[WHITE_LIST[3]] == "HLW")
@@ -109,7 +95,7 @@ def holiday_detection_date(file: Path, file_email: Path, hol_list: list) -> dict
     if final_df.empty:
         return {}
 
-    email_df = pd.read_csv(file_email)
+    email_df = file_email
     EMAIL_WHITE_LIST = [
         "EmplID",
         "PacificEmail",
@@ -125,17 +111,8 @@ def holiday_detection_date(file: Path, file_email: Path, hol_list: list) -> dict
     )
     return return_dict(merged_df)
 
-def no_holiday_detection(file: Path, file_email: Path) -> dict[str:list[str]]:
+def no_holiday_detection(file: DataFrame, file_email: DataFrame) -> dict[str:list[str]]:
     logger = setup_logger("PayRollChecker.log")
-    if not isinstance(file, Path) and not isinstance(file_email, Path):
-        logger.error(f"Bad file input type {type(file)=} {type(file_email)=}")
-        return {}
-
-    if file.is_file() and file_email.is_file():
-        df = pd.read_csv(file)
-    else:
-        logger.error("File doesn't exist!")
-        return {}
 
     WHITE_LIST = [
         "Empl_ID",
@@ -146,7 +123,7 @@ def no_holiday_detection(file: Path, file_email: Path) -> dict[str:list[str]]:
         "appr_id",
         "earning_hours"
     ]
-    new_order_df = df[WHITE_LIST]
+    new_order_df = file[WHITE_LIST]
     filter_holiday = (
         (new_order_df[WHITE_LIST[3]] == "HOL") |
         (new_order_df[WHITE_LIST[3]] == "HLW")
@@ -155,7 +132,7 @@ def no_holiday_detection(file: Path, file_email: Path) -> dict[str:list[str]]:
     if final_df.empty:
         return {}
 
-    email_df = pd.read_csv(file_email)
+    email_df = file_email
     EMAIL_WHITE_LIST = [
         "EmplID",
         "PacificEmail",

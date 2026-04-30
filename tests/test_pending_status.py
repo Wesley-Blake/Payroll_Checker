@@ -1,10 +1,27 @@
 from pathlib import Path
 import pytest
 from helpers.pending_status import pending
+from helpers.pay_detection import make_df
 
 
 class TestPendingStatus:
     """Test cases for pending function"""
+
+    def test_make_df_with_valid_file(self, tmp_path):
+        """Test make_df with valid CSV file"""
+        csv_file = tmp_path / "test.csv"
+        csv_content = "payno,other_col\n1,value\n"
+        csv_file.write_text(csv_content)
+        result = make_df(csv_file, 1)
+        assert result is not None
+
+    def test_make_df_with_invalid_pay_period(self, tmp_path):
+        """Test make_df raises error with wrong pay period"""
+        csv_file = tmp_path / "test.csv"
+        csv_content = "payno,other_col\n1,value\n"
+        csv_file.write_text(csv_content)
+        with pytest.raises(ValueError):
+            make_df(csv_file, 999)
 
     # Basic functionality tests
     def test_pending_with_invalid_path(self):

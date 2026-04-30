@@ -3,14 +3,15 @@
 Handles union/non-union thresholds: union >7.5 hrs, non-union >8 hrs.
 Returns dict mapping manager emails to lists of employee emails.
 """
-import pandas as pd
 from pathlib import Path
+import pandas as pd
+from pandas import DataFrame
 import validators
 from helpers.logger_config import setup_logger
 from helpers.email_list import EmailList
 
 
-def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]:
+def over_eight_hours(file_hours: DataFrame, file_email: DataFrame) -> dict[str, list[str]]:
     """Find employees exceeding 8 hours by manager.
 
     Args:
@@ -22,13 +23,6 @@ def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]
     """
     logger = setup_logger("PayRollChecker.log")
 
-    # Validate input files exist
-    if file_hours.is_file() and file_email.is_file():
-        df = pd.read_csv(file_hours)
-    else:
-        logger.error("Failed to create DataFrame.")
-        return {}
-
     # Select and aggregate hours by employee
     WHITE_LIST = [
         "Empl_ID",
@@ -39,7 +33,7 @@ def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]
         "appr_id",
         "earning_hours"
     ]
-    new_order_df = df[WHITE_LIST]
+    new_order_df = file_hours[WHITE_LIST]
     filtered_df = new_order_df.groupby(
         WHITE_LIST[:-1],
         as_index=False
@@ -68,7 +62,7 @@ def over_eight_hours(file_hours: Path, file_email: Path) -> dict[str, list[str]]
         return {}
 
     # Merge with email data and group by manager
-    email_df = pd.read_csv(file_email)
+    email_df = file_email
     EMAIL_WHITE_LIST = [
         "EmplID",
         "PacificEmail",

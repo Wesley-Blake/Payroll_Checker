@@ -1,9 +1,26 @@
 from pathlib import Path
 import pytest
 from helpers.working.weekend_overtime import weekend_overtime
+from helpers.pay_detection import make_df
 
 class TestWeekendOvertime:
     """Test cases for weekend_overtime function"""
+
+    def test_make_df_with_valid_file(self, tmp_path):
+        """Test make_df with valid CSV file"""
+        csv_file = tmp_path / "test.csv"
+        csv_content = "payno,other_col\n1,value\n"
+        csv_file.write_text(csv_content)
+        result = make_df(csv_file, 1)
+        assert result is not None
+
+    def test_make_df_with_invalid_pay_period(self, tmp_path):
+        """Test make_df raises error with wrong pay period"""
+        csv_file = tmp_path / "test.csv"
+        csv_content = "payno,other_col\n1,value\n"
+        csv_file.write_text(csv_content)
+        with pytest.raises(ValueError):
+            make_df(csv_file, 999)
 
     def test_weekend_overtime_with_invalid_paths(self):
         """Test that invalid paths return empty dict"""
