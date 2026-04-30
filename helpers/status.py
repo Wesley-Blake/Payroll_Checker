@@ -1,14 +1,10 @@
-from pathlib import Path
-import logging
-import pandas as pd
+import pandas
 from pandas import DataFrame
-from helpers.logger_config import setup_logger
-from helpers.email_list import EmailList
+from helpers.support import *
 
 def not_started_list(file: DataFrame) -> EmailList[str, list[str]]:
     logger = setup_logger("PayRollChecker.log")
-    email_list = EmailList()
-
+    # NOTE: implement whitelist
     final_df = file[
         (file["job_ecls"] != "SS") &
         (file["job_ecls"] != "SN") &
@@ -19,7 +15,8 @@ def not_started_list(file: DataFrame) -> EmailList[str, list[str]]:
         return email_list
 
     manager_emails = final_df["ApprEmail"].unique().tolist()
-
+    # NOTE: implement return_dict
+    email_list = EmailList()
     for manager_email in manager_emails:
         email_list.update({manager_email: []})
         employee_email_df = final_df[final_df["ApprEmail"] == manager_email]["EmplEmail"]
@@ -28,3 +25,20 @@ def not_started_list(file: DataFrame) -> EmailList[str, list[str]]:
 
     logger.info("Finished successfully.")
     return email_list
+
+def pending(file: DataFrame) -> list[str]:
+    # NOTE: implement return_dict
+    import validators
+    logger = setup_logger("PayRollChecker.log")
+    final_df = file[file["ts_Status"] == "Pending"]
+    if final_df.empty:
+        logger.info("No employees in pending.")
+        return []
+
+    manager_emails = final_df["ApprEmail"].unique().tolist()
+    for email in manager_emails:
+        if not validators.email(email):
+            logger.debug("Manager emails not emails.")
+            return []
+    logger.info("Finished Successfully.")
+    return manager_emails

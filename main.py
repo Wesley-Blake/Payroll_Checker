@@ -1,41 +1,17 @@
 import os
 from pathlib import Path
 import textwrap
-from datetime import datetime
-import pandas as pd
-from helpers.pay_detection import make_df
-from helpers.holiday_detection import holidays_input
-from helpers.holiday_detection import holiday_detection_type
-from helpers.holiday_detection import holiday_detection_date
-from helpers.holiday_detection import no_holiday_detection
-from helpers.not_started import not_started_list
-from helpers.over_eight_hours import over_eight_hours
-from helpers.over_twelve_hours import over_twleve_hours
-from helpers.overlapping_hours import overlapping_hours
-#from helpers.weekend_overtime import weekend_overtime
-from helpers.pending_status import pending
-from helpers.win32com_email import email
-from helpers.pay_detection import make_df
+import pandas
+from helpers.holiday import *
+from helpers.overlapping_hours import *
+from helpers.overtime import *
+from helpers.status import *
+from helpers.support import *
 
-def pay_period_check() -> int:
-    pay_periods = [str(x) for x in range(1,27)]
-    while True:
-        result = input("What pay period is it? ")
-        correction = input(f"{result} is this correct? [Y/n] ")
-        if correction.lower() == 'n': continue
-        if result in pay_periods: return int(result)
-
-def loading_bar(length, index=1, pre_fix = ''):
-    BAR_LENGTH = 30
-    print()
-    if len(pre_fix) > 0: print(pre_fix)
-    while index <= length:
-        block = int(BAR_LENGTH * index / length)
-        bar = '=' * block + '-' * (BAR_LENGTH - block)
-        yield f'\r|{bar}| {index} / {length} emails sent.'
-        index += 1
 
 def main():
+    # implement asyncio
+    # dict[dfName: df]
     WORKING_DIR = Path.cwd() / 'Payroll-Checker'
     if WORKING_DIR.is_dir():
         os.chdir(WORKING_DIR)
@@ -52,6 +28,7 @@ def main():
     OVERLAPPING = ""
     PENDING = ""
     for file in os.scandir(DOWNLOADS):
+        # implement date detection for files instead of relying on name.
         if "not_yet_started_WTE" in file.name and file.name > NOT_STARTED:
             NOT_STARTED = file.name
         elif "ts_break_down" in file.name and file.name > OVERTIME:
@@ -64,11 +41,12 @@ def main():
             PENDING = file.name
     path_not_started =  make_df(DOWNLOADS / NOT_STARTED, PAY_PERIOD)
     path_overtime = make_df(DOWNLOADS / OVERTIME, PAY_PERIOD)
-    path_email = pd.read_csv(DOWNLOADS / EMAIL)
+    path_email = pandas.read_csv(DOWNLOADS / EMAIL)
     path_overlapping = make_df(DOWNLOADS / OVERLAPPING, PAY_PERIOD)
     path_pending = make_df(DOWNLOADS / PENDING, PAY_PERIOD)
     print("File search compelted!")
 
+    # email templates
 
     # Holiday Detections
     if input("Is there a holiday? [Y/n]") == "n":
