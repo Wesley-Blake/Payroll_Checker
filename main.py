@@ -7,6 +7,7 @@ from helpers.overlapping_hours import *
 from helpers.overtime import *
 from helpers.status import *
 from helpers.support import *
+from helpers.templates import *
 
 
 # implement asyncio
@@ -16,7 +17,7 @@ if WORKING_DIR.is_dir():
     os.chdir(WORKING_DIR)
 else:
     print(WORKING_DIR)
-    raise ValueError
+    raise FileNotFoundError
 DOWNLOADS = Path.home() / "Downloads"
 
 PAY_PERIOD = pay_period_check()
@@ -45,8 +46,6 @@ path_overlapping = make_df(DOWNLOADS / OVERLAPPING, PAY_PERIOD)
 path_pending = make_df(DOWNLOADS / PENDING, PAY_PERIOD)
 print("File search compelted!")
 
-# email templates
-
 # Holiday Detections
 if input("Is there a holiday? [Y/n]") == "n":
     result_no_holiday = no_holiday_detection(path_overtime, path_email)
@@ -59,18 +58,11 @@ if input("Is there a holiday? [Y/n]") == "n":
                 manager,
                 employee,
                 PAY_PERIOD,
-                textwrap.dedent(f"""\
-                Hi,
-
-                Friendly Reminder: Holiday / Holiday Worked was detected.
-                There wasn't a holiday this pay period.
-
-                Manager:
-                Hello! We wanted to let you know that {len(employee)} of your employees have Holiday / Holiday Worked hours for the pay period {PAY_PERIOD}.
-                They've been BCC'd on this email as a helpful reminder, so no action is needed from you at this time.
-
-                Thanks so much, and have a great day!
-                """)
+                NO_HOLIDAY_TEMPLATE + \
+                MANGER_TEMPLATE.substitute(
+                    length=length,
+                    PAY_PERIOD=PAY_PERIOD
+                )
             )
 else:
     list_o_holidays = holidays_input()
@@ -91,19 +83,13 @@ else:
                 manager,
                 employee,
                 PAY_PERIOD,
-                textwrap.dedent(f"""\
-                Hi,
-
-                Friendly Reminder: Holiday / Holiday Worked was detected.
-                Holiday and or Holiday Worked was reported on the incorrect day.
-                {list_o_holidays=}
-
-                Manager:
-                Hello! We wanted to let you know that {len(employee)} of your employees have entered Holiday or Holiday Worked on the incorrect day for the pay period {PAY_PERIOD}.
-                They've been BCC'd on this email as a helpful reminder, so no action is needed from you at this time.
-
-                Thanks so much, and have a great day!
-                """)
+                HOLIDAY_TYPE_TEMPLATE.substitute(
+                    list_o_holidays=list_o_holidays
+                ) + \
+                MANGER_TEMPLATE.substitute(
+                    length=length,
+                    PAY_PERIOD=PAY_PERIOD
+                )
             )
     result_holiday_date = holiday_detection_date(path_overtime, path_email, list_o_holidays)
     length = len(result_holiday_date)
@@ -115,19 +101,13 @@ else:
                 manager,
                 employee,
                 PAY_PERIOD,
-                textwrap.dedent(f"""\
-                Hi,
-
-                Friendly Reminder: Holiday / Holiday Worked was detected.
-                Holiday Pay doesn't reflect on the holiday.
-                {list_o_holidays=}
-
-                Manager:
-                Hello! We wanted to let you know that {len(employee)} of your employees have didn't report Holiday Pay for the pay period {PAY_PERIOD}.
-                They've been BCC'd on this email as a helpful reminder, so no action is needed from you at this time.
-
-                Thanks so much, and have a great day!
-                """)
+                HOLIDAY_DATE_TEMPLATE.substitute(
+                    list_o_holidays=list_o_holidays
+                ) + \
+                MANGER_TEMPLATE.substitute(
+                    length=length,
+                    PAY_PERIOD=PAY_PERIOD
+                )
             )
 
 # Not Started Check
@@ -141,18 +121,11 @@ if length > 0:
             manager,
             employee,
             PAY_PERIOD,
-            textwrap.dedent(f"""\
-            Hi,
-
-            Friendly Reminder: Timesheet Not Started
-            Timesheets are due this friday!
-
-            Manager:
-            Hello! We wanted to let you know that {len(employee)} of your employees have not started their timesheet for the pay period {PAY_PERIOD}.
-            They've been BCC'd on this email as a helpful reminder, so no action is needed from you at this time.
-
-            Thanks so much, and have a great day!
-            """)
+            NOT_STARTED_TEMPLATE + \
+            MANGER_TEMPLATE.substitute(
+                length=length,
+                PAY_PERIOD=PAY_PERIOD
+            )
         )
 
 # Overtime Check
@@ -166,21 +139,11 @@ if  length > 0:
             manager,
             employee,
             PAY_PERIOD,
-            textwrap.dedent(f"""\
-            Hi,
-
-            Friendly Reminder: Overtime Not Allocated
-
-            We wanted to let you know that you recorded more than 8 hours of regular (7.5 for union) time in a single day, and overtime has not yet been allocated.
-            For helpful guidance, you can review the overtime rules here: https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
-            Essentially, you should put 8 (7.5 union) in Regular Earnings, the rest goes in Overtime.
-
-            Manager Notification:
-            You're receiving this email because {len(employee)} of your employees haven't allocated Overtime for the pay period {PAY_PERIOD}.
-            They've been BCC'd on this message as a friendly reminder, so no action is needed from you at this time.
-
-            Thanks so much, and appreciate your support!
-            """)
+            OVERTIME_TEMPLATE + \
+            MANGER_TEMPLATE.substitute(
+                length=length,
+                PAY_PERIOD=PAY_PERIOD
+            )
         )
 
 # Over twelve hours in a day Overtime
@@ -194,22 +157,11 @@ if length > 0:
             manager,
             employee,
             PAY_PERIOD,
-            textwrap.dedent(f"""\
-            Hi,
-
-            Friendly Reminder: Overtime for Hours Over 12 Not Allocated
-
-            We wanted to share a quick reminder that any hours worked over 12 in a single day (regular + overtime) are automatically considered OT2 and may need to be allocated accordingly.
-            For more information, you can review the guidelines here: https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
-            Example:
-                8 REG (7.5 unoin) + 4 OT (4.5 union) = 12 hours and everything else is in OT2.
-
-            Manager Notification:
-            You're receiving this email because {len(employee)} of your employees have a timesheet item to review for the pay period {PAY_PERIOD}.
-            They've been BCC'd on this message as a helpful reminder, so no action is needed from you at this time.
-
-            Thanks so much, and we appreciate your support!
-            """)
+            OVER_TWELVE_TEMPLATE + \
+            MANGER_TEMPLATE.substitute(
+                length=length,
+                PAY_PERIOD=PAY_PERIOD
+            )
         )
 
 # Overlapping Check
@@ -223,46 +175,12 @@ if  length > 0:
             manager,
             employee,
             PAY_PERIOD,
-            textwrap.dedent(f"""\
-            Hi,
-
-            Friendly Reminder: Overlapping Hours
-
-            We noticed that there are some hours on your timesheet that overlap. This happens from time to time and can usually be resolved with a quick review.
-            Additionally, if you are using the Employee Services (new), the yellow (!) will tell you specifics.
-
-            Manager Notification:
-            You're receiving this email because {len(employee)} of your employees have a timesheet item to review for the pay period {PAY_PERIOD}.
-            They've been BCC'd on this message as a helpful reminder, so no action is needed from you at this time.
-
-            Thanks so much, and have a great day!
-            """)
+            OVERLAPPING_TEMPLATE + \
+            MANGER_TEMPLATE.substitute(
+                length=length,
+                PAY_PERIOD=PAY_PERIOD
+            )
         )
-
-# Weekend Overtime Not Allocated
-#result_weekend_overtime = weekend_overtime(path_overtime,path_email)
-#length = len(result_weekend_overtime)
-#if length > 0:
-#    my_bar = loading_bar(length, pre_fix="Weekend Overtime Emails:")
-#    for manager, employee in result_weekend_overtime.items():
-#        print(next(my_bar), end='', flush=True)
-#        email(
-#            manager,
-#            employee,
-#            PAY_PERIOD,
-#            textwrap.dedent(f"""\
-#            Hi,
-
-#            Employee Action: Weekend Overtime Not Allocated!
-#            Union: if you had REG from Monday to Friday, Saturday and Sunday are Overtime by default.
-#            Everyone else: if you worked 40 hours REG from Monday, everyting is Overtime by default.
-#            https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
-
-#            For Manager:
-#            If you are receiving this email, it means that {len(employee)} of your employees have some issue related to their timesheet: {PAY_PERIOD}.
-#            They are BCC'd on this email, so there is no action needed on your part.
-#            """)
-#        )
 
 # Pending Check
 result_pending = pending(path_pending)
@@ -273,13 +191,5 @@ if len(result_pending) > 0:
         "",
         result_pending,
         PAY_PERIOD,
-        textwrap.dedent(f"""\
-        Hi,
-
-        Manager Reminder: Pending Approvals
-
-        Just a quick heads-up that you have employees whose timesheets are currently in a pending status and ready for your approval when you have a moment.
-
-        Thanks so much for your time and support!
-        """)
+        PENDING_TEMPLATE
     )
