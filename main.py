@@ -16,12 +16,9 @@ WORKING_DIR = Path.cwd() / 'Payroll-Checker'
 if WORKING_DIR.is_dir():
     os.chdir(WORKING_DIR)
 else:
-    print(WORKING_DIR)
     raise FileNotFoundError
 DOWNLOADS = Path.home() / "Downloads"
-
 PAY_PERIOD = pay_period_check()
-print("Starting file search:")
 NOT_STARTED = ""
 OVERTIME = ""
 EMAIL = ""
@@ -44,7 +41,10 @@ path_overtime = make_df(DOWNLOADS / OVERTIME, PAY_PERIOD)
 path_email = pandas.read_csv(DOWNLOADS / EMAIL)
 path_overlapping = make_df(DOWNLOADS / OVERLAPPING, PAY_PERIOD)
 path_pending = make_df(DOWNLOADS / PENDING, PAY_PERIOD)
-print("File search compelted!")
+# end implement asyncio
+
+# Setup winemailer.send_email class
+emailer = winEmail()
 
 # Holiday Detections
 if input("Is there a holiday? [Y/n]") == "n":
@@ -53,8 +53,8 @@ if input("Is there a holiday? [Y/n]") == "n":
     if length > 0:
         my_bar = loading_bar(length, pre_fix="No Holiday Email:")
         for manager, employee in result_no_holiday.items():
-            print(next(my_bar), end='', flush=True)
-            email(
+            my_bar()
+            emailer.send_email(
                 manager,
                 employee,
                 PAY_PERIOD,
@@ -78,8 +78,8 @@ else:
     if length > 0:
         my_bar = loading_bar(length, pre_fix="Holiday Type Email:")
         for manager, employee in result_holiday_type.items():
-            print(next(my_bar), end='', flush=True)
-            email(
+            my_bar()
+            emailer.send_email(
                 manager,
                 employee,
                 PAY_PERIOD,
@@ -96,8 +96,8 @@ else:
     if length > 0:
         my_bar = loading_bar(length, pre_fix="Holiday Date Email:")
         for manager, employee in result_holiday_date.items():
-            print(next(my_bar), end='', flush=True)
-            email(
+            my_bar()
+            emailer.send_email(
                 manager,
                 employee,
                 PAY_PERIOD,
@@ -116,8 +116,8 @@ length = len(result_not_started)
 if length > 0:
     my_bar = loading_bar(length, pre_fix="Not Started Emails:")
     for manager, employee in result_not_started.items():
-        print(next(my_bar), end='', flush=True)
-        email(
+        my_bar()
+        emailer.send_email(
             manager,
             employee,
             PAY_PERIOD,
@@ -131,11 +131,11 @@ if length > 0:
 # Overtime Check
 result_overtime = over_eight_hours(path_overtime, path_email)
 length = len(result_overtime)
-if  length > 0:
-    my_bar = loading_bar(length, pre_fix="Overitme Emails over 8 hours: ")
+if length > 0:
+    my_bar = loading_bar(length, pre_fix="Overitme over 8 hours: ")
     for manager, employee in result_overtime.items():
-        print(next(my_bar), end='', flush=True)
-        email(
+        my_bar()
+        emailer.send_email(
             manager,
             employee,
             PAY_PERIOD,
@@ -152,8 +152,8 @@ length = len(result_over_twelve)
 if length > 0:
     my_bar = loading_bar(length, pre_fix="Overitme Emails over 12 hours: ")
     for manager, employee in result_over_twelve.items():
-        print(next(my_bar), end='', flush=True)
-        email(
+        my_bar()
+        emailer.send_email(
             manager,
             employee,
             PAY_PERIOD,
@@ -170,8 +170,8 @@ length = len(result_overlapping)
 if  length > 0:
     my_bar = loading_bar(length, pre_fix="Overlapping Hours Emails:")
     for manager, employee in result_overlapping.items():
-        print(next(my_bar), end='', flush=True)
-        email(
+        my_bar()
+        emailer.send_email(
             manager,
             employee,
             PAY_PERIOD,
@@ -186,8 +186,8 @@ if  length > 0:
 result_pending = pending(path_pending)
 if len(result_pending) > 0:
     my_bar = loading_bar(1, pre_fix="Pending Email:")
-    print(next(my_bar), end='', flush=True)
-    email(
+    my_bar()
+    emailer.send_email(
         "",
         result_pending,
         PAY_PERIOD,

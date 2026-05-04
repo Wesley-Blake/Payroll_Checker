@@ -23,14 +23,17 @@ def pay_period_check() -> int:
         if result in pay_periods: return int(result)
 
 def loading_bar(length, index=1, pre_fix = ''):
-    BAR_LENGTH = 30
     print()
-    if len(pre_fix) > 0: print(pre_fix)
-    while index <= length:
-        block = int(BAR_LENGTH * index / length)
-        bar = '=' * block + '-' * (BAR_LENGTH - block)
-        yield f'\r|{bar}| {index} / {length} emails sent.'
-        index += 1
+    def make_bar(length=length, index=index, pre_fix=pre_fix):
+        BAR_LENGTH = 30
+        if len(pre_fix) > 0: print(pre_fix)
+        while index <= length:
+            block = int(BAR_LENGTH * index / length)
+            bar = '=' * block + '-' * (BAR_LENGTH - block)
+            yield f'\r|{bar}| {index} / {length} emails sent.'
+            index += 1
+    g = make_bar()
+    return lambda: print(next(g), end='', flush=True)
 
 def setup_logger(name: str) -> object:
     logger = logging.getLogger(name)
@@ -76,22 +79,20 @@ def return_dict(merged_df: DataFrame) -> EmailList[str:list[str]]:
     logger.info("Finished Successfully.")
     return result
 
-def email(cc: str, bcc: list[str], pay_period: str, body: str) -> None:
-    # NOTE: class
+class winEmail:
     try:
         outlook = win32.Dispatch('outlook.application')
     except Exception as e:
-        SystemExit(f'Failed to create Outlook application: {e}')
-
-    # NTOE: class method
-    mail = outlook.CreateItem(0)
-    mail.CC = cc
-    mail.BCC = '; '.join(bcc)
-    mail.Subject = f'Pay Period: BW{pay_period}'
-    with open('secret.txt', 'r') as file:
-        attachment = Path(file.readline().strip())
-    if attachment.is_file():
-        mail.Attachments.Add(str(attachment))
-    mail.Body = body
-    #mail.Display()
-    mail.Send()
+        raise ValueError(f"Error initializing Outlook: {e}")
+    def send_email(self, cc: str, bcc: list[str], pay_period: str, body: str) -> None:
+        mail = self.outlook.CreateItem(0)
+        mail.CC = cc
+        mail.BCC = '; '.join(bcc)
+        mail.Subject = f'Pay Period: BW{pay_period}'
+        with open('secret.txt', 'r') as file:
+            attachment = Path(file.readline().strip())
+        if attachment.is_file():
+            mail.Attachments.Add(str(attachment))
+        mail.Body = body
+        #mail.Display()
+        mail.Send()
