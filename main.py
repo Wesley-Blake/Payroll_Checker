@@ -12,6 +12,9 @@ from helpers.templates import *
 
 # implement asyncio
 # dict[dfName: df]
+with open("secret.txt", "r") as f:
+    _ = f.readline().strip()
+    TIMESHEET_LINK = f.readline().strip()
 WORKING_DIR = Path.cwd() / 'Payroll-Checker'
 if WORKING_DIR.is_dir():
     os.chdir(WORKING_DIR)
@@ -51,7 +54,7 @@ if input("Is there a holiday? [Y/n]") == "n":
     result_no_holiday = no_holiday_detection(path_overtime, path_email)
     length = len(result_no_holiday)
     if length > 0:
-        my_bar = loading_bar(length, pre_fix="No Holiday Email:")
+        my_bar = loading_bar(length, prefix="No Holiday Email:")
         for manager, employee in result_no_holiday.items():
             my_bar()
             emailer.send_email(
@@ -59,7 +62,8 @@ if input("Is there a holiday? [Y/n]") == "n":
                 employee,
                 PAY_PERIOD,
                 NO_HOLIDAY_TEMPLATE + \
-                MANGER_TEMPLATE.substitute(
+                TIMESHEET_LINK + \
+                MANAGER_TEMPLATE.substitute(
                     length=length,
                     PAY_PERIOD=PAY_PERIOD
                 )
@@ -76,7 +80,7 @@ else:
     )
     length = len(result_holiday_type)
     if length > 0:
-        my_bar = loading_bar(length, pre_fix="Holiday Type Email:")
+        my_bar = loading_bar(length, prefix="Holiday Type Email:")
         for manager, employee in result_holiday_type.items():
             my_bar()
             emailer.send_email(
@@ -86,7 +90,8 @@ else:
                 HOLIDAY_TYPE_TEMPLATE.substitute(
                     list_o_holidays=list_o_holidays
                 ) + \
-                MANGER_TEMPLATE.substitute(
+                TIMESHEET_LINK + \
+                MANAGER_TEMPLATE.substitute(
                     length=length,
                     PAY_PERIOD=PAY_PERIOD
                 )
@@ -94,7 +99,7 @@ else:
     result_holiday_date = holiday_detection_date(path_overtime, path_email, list_o_holidays)
     length = len(result_holiday_date)
     if length > 0:
-        my_bar = loading_bar(length, pre_fix="Holiday Date Email:")
+        my_bar = loading_bar(length, prefix="Holiday Date Email:")
         for manager, employee in result_holiday_date.items():
             my_bar()
             emailer.send_email(
@@ -104,7 +109,8 @@ else:
                 HOLIDAY_DATE_TEMPLATE.substitute(
                     list_o_holidays=list_o_holidays
                 ) + \
-                MANGER_TEMPLATE.substitute(
+                TIMESHEET_LINK + \
+                MANAGER_TEMPLATE.substitute(
                     length=length,
                     PAY_PERIOD=PAY_PERIOD
                 )
@@ -114,7 +120,7 @@ else:
 result_not_started = not_started_list(path_not_started)
 length = len(result_not_started)
 if length > 0:
-    my_bar = loading_bar(length, pre_fix="Not Started Emails:")
+    my_bar = loading_bar(length, prefix="Not Started Emails:")
     for manager, employee in result_not_started.items():
         my_bar()
         emailer.send_email(
@@ -122,7 +128,8 @@ if length > 0:
             employee,
             PAY_PERIOD,
             NOT_STARTED_TEMPLATE + \
-            MANGER_TEMPLATE.substitute(
+            TIMESHEET_LINK + \
+            MANAGER_TEMPLATE.substitute(
                 length=length,
                 PAY_PERIOD=PAY_PERIOD
             )
@@ -132,7 +139,7 @@ if length > 0:
 result_overtime = over_eight_hours(path_overtime, path_email)
 length = len(result_overtime)
 if length > 0:
-    my_bar = loading_bar(length, pre_fix="Overitme over 8 hours: ")
+    my_bar = loading_bar(length, prefix="Overtime over 8 hours: ")
     for manager, employee in result_overtime.items():
         my_bar()
         emailer.send_email(
@@ -140,17 +147,18 @@ if length > 0:
             employee,
             PAY_PERIOD,
             OVERTIME_TEMPLATE + \
-            MANGER_TEMPLATE.substitute(
+            TIMESHEET_LINK + \
+            MANAGER_TEMPLATE.substitute(
                 length=length,
                 PAY_PERIOD=PAY_PERIOD
             )
         )
 
 # Over twelve hours in a day Overtime
-result_over_twelve = over_twleve_hours(path_overtime, path_email)
+result_over_twelve = over_twelve_hours(path_overtime, path_email)
 length = len(result_over_twelve)
 if length > 0:
-    my_bar = loading_bar(length, pre_fix="Overitme Emails over 12 hours: ")
+    my_bar = loading_bar(length, prefix="Overtime Emails over 12 hours: ")
     for manager, employee in result_over_twelve.items():
         my_bar()
         emailer.send_email(
@@ -158,7 +166,8 @@ if length > 0:
             employee,
             PAY_PERIOD,
             OVER_TWELVE_TEMPLATE + \
-            MANGER_TEMPLATE.substitute(
+            TIMESHEET_LINK + \
+            MANAGER_TEMPLATE.substitute(
                 length=length,
                 PAY_PERIOD=PAY_PERIOD
             )
@@ -168,7 +177,7 @@ if length > 0:
 result_overlapping = overlapping_hours(path_overlapping)
 length = len(result_overlapping)
 if  length > 0:
-    my_bar = loading_bar(length, pre_fix="Overlapping Hours Emails:")
+    my_bar = loading_bar(length, prefix="Overlapping Hours Emails:")
     for manager, employee in result_overlapping.items():
         my_bar()
         emailer.send_email(
@@ -176,7 +185,8 @@ if  length > 0:
             employee,
             PAY_PERIOD,
             OVERLAPPING_TEMPLATE + \
-            MANGER_TEMPLATE.substitute(
+            TIMESHEET_LINK + \
+            MANAGER_TEMPLATE.substitute(
                 length=length,
                 PAY_PERIOD=PAY_PERIOD
             )
@@ -185,7 +195,7 @@ if  length > 0:
 # Pending Check
 result_pending = pending(path_pending)
 if len(result_pending) > 0:
-    my_bar = loading_bar(1, pre_fix="Pending Email:")
+    my_bar = loading_bar(1, prefix="Pending Email:")
     my_bar()
     emailer.send_email(
         "",

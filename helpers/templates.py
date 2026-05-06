@@ -51,7 +51,7 @@ Friendly Reminder: Overtime for Hours Over 12 Not Allocated
 We wanted to share a quick reminder that any hours worked over 12 in a single day (regular + overtime) are automatically considered OT2 and may need to be allocated accordingly.
 For more information, you can review the guidelines here: https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
 Example:
-8 REG (7.5 unoin) + 4 OT (4.5 union) = 12 hours and everything else is in OT2.
+8 REG (7.5 union) + 4 OT (4.5 union) = 12 hours and everything else is in OT2.
 """
 
 OVERLAPPING_TEMPLATE = """\
@@ -73,7 +73,7 @@ Just a quick heads-up that you have employees whose timesheets are currently in 
 Thanks so much for your time and support!
 """
 
-MANGER_TEMPLATE = Template("""\n
+MANAGER_TEMPLATE = Template("""\n
 Manager Notification:
 You're receiving this email because ${length} of your employees have a timesheet item to review for the pay period ${PAY_PERIOD}.
 They've been BCC'd on this message as a helpful reminder, so no action is needed from you at this time.

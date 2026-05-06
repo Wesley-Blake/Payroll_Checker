@@ -22,11 +22,11 @@ def pay_period_check() -> int:
         if correction.lower() == 'n': continue
         if result in pay_periods: return int(result)
 
-def loading_bar(length, index=1, pre_fix = '') -> callable:
+def loading_bar(length, index=1, prefix = '') -> callable:
     print()
-    def make_bar(length=length, index=index, pre_fix=pre_fix) -> str:
+    def make_bar(length=length, index=index, prefix=prefix) -> str:
         BAR_LENGTH = 30
-        if len(pre_fix) > 0: print(pre_fix)
+        if len(prefix) > 0: print(prefix)
         while index <= length:
             block = int(BAR_LENGTH * index / length)
             bar = '=' * block + '-' * (BAR_LENGTH - block)

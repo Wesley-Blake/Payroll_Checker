@@ -55,7 +55,7 @@ def over_eight_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[
     logger.info(f"Found {len(merged_df)} employees with excessive hours.")
     return return_dict(merged_df)
 
-def over_twleve_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[str, list[str]]:
+def over_twelve_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[str, list[str]]:
     logger = setup_logger("PayRollChecker.log")
     WHITE_LIST = [
         "Empl_ID",
