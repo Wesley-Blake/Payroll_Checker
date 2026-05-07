@@ -64,7 +64,7 @@ if input("Is there a holiday? [Y/n]") == "n":
                 NO_HOLIDAY_TEMPLATE + \
                 TIMESHEET_LINK + \
                 MANAGER_TEMPLATE.substitute(
-                    length=length,
+                    length=len(result_no_holiday[manager]),
                     PAY_PERIOD=PAY_PERIOD
                 )
             )
@@ -92,7 +92,7 @@ else:
                 ) + \
                 TIMESHEET_LINK + \
                 MANAGER_TEMPLATE.substitute(
-                    length=length,
+                    length=len(result_holiday_type[manager]),
                     PAY_PERIOD=PAY_PERIOD
                 )
             )
@@ -111,7 +111,7 @@ else:
                 ) + \
                 TIMESHEET_LINK + \
                 MANAGER_TEMPLATE.substitute(
-                    length=length,
+                    length=len(result_holiday_date[manager]),
                     PAY_PERIOD=PAY_PERIOD
                 )
             )
@@ -130,7 +130,7 @@ if length > 0:
             NOT_STARTED_TEMPLATE + \
             TIMESHEET_LINK + \
             MANAGER_TEMPLATE.substitute(
-                length=length,
+                length=len(result_not_started[manager]),
                 PAY_PERIOD=PAY_PERIOD
             )
         )
@@ -149,7 +149,7 @@ if length > 0:
             OVERTIME_TEMPLATE + \
             TIMESHEET_LINK + \
             MANAGER_TEMPLATE.substitute(
-                length=length,
+                length=len(result_overtime[manager]),
                 PAY_PERIOD=PAY_PERIOD
             )
         )
@@ -168,7 +168,7 @@ if length > 0:
             OVER_TWELVE_TEMPLATE + \
             TIMESHEET_LINK + \
             MANAGER_TEMPLATE.substitute(
-                length=length,
+                length=len(result_over_twelve[manager]),
                 PAY_PERIOD=PAY_PERIOD
             )
         )
@@ -187,7 +187,7 @@ if  length > 0:
             OVERLAPPING_TEMPLATE + \
             TIMESHEET_LINK + \
             MANAGER_TEMPLATE.substitute(
-                length=length,
+                length=len(result_overlapping[manager]),
                 PAY_PERIOD=PAY_PERIOD
             )
         )
