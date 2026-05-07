@@ -12,7 +12,7 @@ from helpers.templates import *
 
 # implement asyncio
 # dict[dfName: df]
-with open("secret.txt", "r") as f:
+with open("Payroll-Checker\\secret.txt", "r") as f:
     _ = f.readline().strip()
     TIMESHEET_LINK = f.readline().strip()
 WORKING_DIR = Path.cwd() / 'Payroll-Checker'
