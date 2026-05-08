@@ -30,7 +30,6 @@ NOT_STARTED_TEMPLATE = """\
 Hi,
 
 Friendly Reminder: Timesheet Not Started
-Timesheets are due this friday!
 """
 
 OVERTIME_TEMPLATE = """\
