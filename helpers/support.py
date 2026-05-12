@@ -6,13 +6,19 @@ import validators
 import win32com.client as win32
 
 
-class EmailList(dict):
-    def __setitem__(self, key, value):
-        if not validators.email(key):
-            raise ValueError(f"Invalid email address: {key}")
-        if not isinstance(value, list) or not all(validators.email(email) for email in value):
-            raise ValueError(f"Value must be a list of valid email addresses: {value}")
-        super().__setitem__(key, value)
+#class EmailList(dict):
+#    def __setitem__(self, key, value):
+#        if not validators.email(key):
+#            raise ValueError(f"Invalid email address: {key}")
+#        if not isinstance(value, list) or not all(validators.email(email) for email in value):
+#            raise ValueError(f"Value must be a list of valid email addresses: {value}")
+#        super().__setitem__(key, value)
+def make_list(check: list) -> list:
+    if not isinstance(check, list): raise ValueError
+    for i in check:
+        if not validators.email(i): raise ValueError
+    else:
+        return check
 
 def pay_period_check() -> int:
     pay_periods = [str(x) for x in range(1,27)]
@@ -62,37 +68,42 @@ def make_df(file: Path, pay_period: int) -> DataFrame:
         raise ValueError(f"Pay period {pay_period} not found in file {file.name}")
 
 # NOTE: pass logger?
-def return_dict(merged_df: DataFrame) -> EmailList[str:list[str]]:
-    logger = setup_logger("PayRollChecker.log")
-    headers = merged_df.columns
-    if "appr" not in headers[-1].lower() and "super" not in headers[-1].lower():
-        raise ValueError(f"Last column must be manager email, found {headers[-1]}")
-    if "empl" not in headers[-2].lower() and "pacific" not in headers[-2].lower():
-        raise ValueError(f"Last column must be employee email, found {headers[-2]}")
-    result = EmailList()
-    manager_emails: list[str] = merged_df[headers[-1]].unique().tolist()
-    for manager_email in manager_emails:
-        result.update({manager_email: []})
-        employee_email_df = merged_df[merged_df[headers[-1]] == manager_email][headers[-2]]
-        employee_email_list = employee_email_df.unique().tolist()
-        result[manager_email] += employee_email_list
-    logger.info("Finished Successfully.")
-    return result
+#def return_dict(merged_df: DataFrame) -> EmailList[str:list[str]]:
+#    logger = setup_logger("PayRollChecker.log")
+#    headers = merged_df.columns
+#    if "appr" not in headers[-1].lower() and "super" not in headers[-1].lower():
+#        raise ValueError(f"Last column must be manager email, found {headers[-1]}")
+#    if "empl" not in headers[-2].lower() and "pacific" not in headers[-2].lower():
+#        raise ValueError(f"Last column must be employee email, found {headers[-2]}")
+#    result = EmailList()
+#    manager_emails: list[str] = merged_df[headers[-1]].unique().tolist()
+#    for manager_email in manager_emails:
+#        result.update({manager_email: []})
+#        employee_email_df = merged_df[merged_df[headers[-1]] == manager_email][headers[-2]]
+#        employee_email_list = employee_email_df.unique().tolist()
+#        result[manager_email] += employee_email_list
+#    logger.info("Finished Successfully.")
+#    return result
 
 class winEmail:
-    try:
-        outlook = win32.Dispatch('outlook.application')
-    except Exception as e:
-        raise ValueError(f"Error initializing Outlook: {e}")
-    def send_email(self, cc: str, bcc: list[str], pay_period: str, body: str) -> None:
-        mail = self.outlook.CreateItem(0)
-        mail.CC = cc
-        mail.BCC = '; '.join(bcc)
-        mail.Subject = f'Pay Period: BW{pay_period}'
-        with open('secret.txt', 'r') as file:
-            attachment = Path(file.readline().strip())
-        if attachment.is_file():
-            mail.Attachments.Add(str(attachment))
-        mail.Body = body
-        #mail.Display()
-        mail.Send()
+    def __init__(self):
+        try:
+            self.outlook = win32.Dispatch('outlook.application')
+        except Exception as e:
+            raise RuntimeError(f"Error initializing Outlook: {e}")
+    def send_email(self, bcc: list[str], pay_period: str, body: str) -> None:
+        try:
+            mail = self.outlook.CreateItem(0)
+            #mail.CC = cc
+            mail.BCC = '; '.join(bcc)
+            mail.Subject = f'Pay Period: BW{pay_period}'
+            with open('secret.txt', 'r') as file:
+                attachment = Path(file.readline().strip())
+            if attachment.is_file():
+                mail.Attachments.Add(str(attachment))
+            mail.Body = body
+            #mail.Display()
+            mail.Send()
+        finally:
+            if mail is not None:
+                del mail

@@ -3,7 +3,7 @@ from pandas import DataFrame
 from helpers.support import *
 
 
-def over_eight_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[str, list[str]]:
+def over_eight_hours(file_hours: DataFrame, file_email: DataFrame) -> list[str]:
     logger = setup_logger("PayRollChecker.log")
     WHITE_LIST = [
         "Empl_ID",
@@ -37,7 +37,7 @@ def over_eight_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[
     final_df = filtered_df[earn_code & (union | non_union)]
     if final_df.empty:
         logger.info("No employees with excessive hours.")
-        return {}
+        return []
 
     EMAIL_WHITE_LIST = [
         "EmplID",
@@ -53,9 +53,9 @@ def over_eight_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[
         how="inner"
     )
     logger.info(f"Found {len(merged_df)} employees with excessive hours.")
-    return return_dict(merged_df)
+    return make_list(merged_df["PacificEmail"].unique().tolist())
 
-def over_twelve_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList[str, list[str]]:
+def over_twelve_hours(file_hours: DataFrame, file_email: DataFrame) -> list[str]:
     logger = setup_logger("PayRollChecker.log")
     WHITE_LIST = [
         "Empl_ID",
@@ -82,7 +82,7 @@ def over_twelve_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList
     final_df = filtered_df[earn_code & over_twelve_df]
     if final_df.empty:
         logger.info("No employees with excessive hours.")
-        return {}
+        return []
 
     EMAIL_WHITE_LIST = [
         "EmplID",
@@ -98,4 +98,4 @@ def over_twelve_hours(file_hours: DataFrame, file_email: DataFrame) -> EmailList
         how="inner"
     )
     logger.info(f"Found {len(merged_df)} employees with excessive hours.")
-    return return_dict(merged_df)
+    return make_list(merged_df["PacificEmail"].unique().tolist())

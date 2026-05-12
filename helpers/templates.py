@@ -38,6 +38,7 @@ Hi,
 Friendly Reminder: Overtime Not Allocated
 
 We wanted to let you know that you recorded more than 8 hours of regular (7.5 for union) time in a single day, and overtime has not yet been allocated.
+
 For helpful guidance, you can review the overtime rules here: https://www.dir.ca.gov/dlse/FAQ_Overtime.htm
 Essentially, you should put 8 (7.5 union) in Regular Earnings, the rest goes in Overtime.
 """
