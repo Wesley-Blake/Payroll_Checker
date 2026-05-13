@@ -22,15 +22,15 @@ else:
     raise FileNotFoundError
 DOWNLOADS = Path.home() / "Downloads"
 PAY_PERIOD = pay_period_check()
-#NOT_STARTED = ""
+NOT_STARTED = ""
 OVERTIME = ""
 EMAIL = ""
 OVERLAPPING = ""
 PENDING = ""
 for file in os.scandir(DOWNLOADS):
     # implement date detection for files instead of relying on name.
-    #if "not_yet_started_WTE" in file.name and file.name > NOT_STARTED:
-    #    NOT_STARTED = file.name
+    if "not_yet_started_WTE" in file.name and file.name > NOT_STARTED:
+        NOT_STARTED = file.name
     if "ts_break_down" in file.name and file.name > OVERTIME:
         OVERTIME = file.name
     elif "Active" in file.name and file.name > EMAIL:
@@ -39,7 +39,7 @@ for file in os.scandir(DOWNLOADS):
         OVERLAPPING = file.name
     elif "Time_Sheet_Status" in file.name and file.name > PENDING:
         PENDING = file.name
-#path_not_started =  make_df(DOWNLOADS / NOT_STARTED, PAY_PERIOD)
+path_not_started =  make_df(DOWNLOADS / NOT_STARTED, PAY_PERIOD)
 path_overtime = make_df(DOWNLOADS / OVERTIME, PAY_PERIOD)
 path_email = pandas.read_csv(DOWNLOADS / EMAIL)
 path_overlapping = make_df(DOWNLOADS / OVERLAPPING, PAY_PERIOD)
@@ -90,18 +90,15 @@ else:
         )
 
 # Not Started Check
-#result_not_started = not_started_list(path_not_started)
-#length = len(result_not_started)
-#if length > 0:
-#    my_bar = loading_bar(length, prefix="Not Started Emails:")
-#    for employee in result_not_started:
-#        my_bar()
-#        emailer.send_email(
-#            employee,
-#            PAY_PERIOD,
-#            NOT_STARTED_TEMPLATE + \
-#            TIMESHEET_LINK
-#        )
+result_not_started = not_started_list(path_not_started)
+length = len(result_not_started)
+if length > 0:
+    emailer.send_email(
+        result_not_started,
+        PAY_PERIOD,
+        NOT_STARTED_TEMPLATE + \
+        TIMESHEET_LINK
+    )
 
 # Overtime Check
 result_overtime = over_eight_hours(path_overtime, path_email)
