@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import textwrap
 import pandas
+from helpers.charter import *
 from helpers.holiday import *
 from helpers.overlapping_hours import *
 from helpers.overtime import *
@@ -138,3 +139,8 @@ if len(result_pending) > 0:
         PAY_PERIOD,
         PENDING_TEMPLATE
     )
+plot_timesheet_statuses(
+    path_pending,
+    title=f"{PAY_PERIOD} Timesheet Status Distribution",
+    save_path=DOWNLOADS / "Timesheet_Status_Distribution.png"
+)
