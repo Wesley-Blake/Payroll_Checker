@@ -144,3 +144,8 @@ plot_timesheet_statuses(
     title=f"{PAY_PERIOD} Timesheet Status Distribution",
     save_path=DOWNLOADS / "Timesheet_Status_Distribution.png"
 )
+plot_timesheet_statuses_by_job_ecls(
+    path_pending,
+    title=f"{PAY_PERIOD} Timesheet Status Distribution",
+    save_path=DOWNLOADS / "Timesheet_Status_Distribution_by_Job_Ecls.png"
+)
